@@ -17,7 +17,7 @@
 
 from typing import List, Optional
 
-from pygls.lsp.methods import ON_TYPE_FORMATTING
+from pygls.lsp.types import TEXT_DOCUMENT_ON_TYPE_FORMATTING
 from pygls.lsp.types import (
     DocumentOnTypeFormattingOptions,
     DocumentOnTypeFormattingParams,
@@ -36,7 +36,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            ON_TYPE_FORMATTING,
+            TEXT_DOCUMENT_ON_TYPE_FORMATTING,
             DocumentOnTypeFormattingOptions(
                 first_trigger_character=":",
                 more_trigger_character=[",", "."],
@@ -83,7 +83,7 @@ def test_capabilities(client_server):
 def test_on_type_formatting_return_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        ON_TYPE_FORMATTING,
+        TEXT_DOCUMENT_ON_TYPE_FORMATTING,
         DocumentOnTypeFormattingParams(
             text_document=TextDocumentIdentifier(uri="file://return.list"),
             position=Position(line=0, character=0),
@@ -111,7 +111,7 @@ def test_on_type_formatting_return_list(client_server):
 def test_on_type_formatting_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        ON_TYPE_FORMATTING,
+        TEXT_DOCUMENT_ON_TYPE_FORMATTING,
         DocumentOnTypeFormattingParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             position=Position(line=0, character=0),

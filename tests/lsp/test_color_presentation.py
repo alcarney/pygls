@@ -17,7 +17,7 @@
 
 from typing import List
 
-from pygls.lsp.methods import COLOR_PRESENTATION
+from pygls.lsp.types import TEXT_DOCUMENT_COLOR_PRESENTATION
 from pygls.lsp.types import (
     Color,
     ColorPresentation,
@@ -35,7 +35,7 @@ class ConfiguredLS(ClientServer):
     def __init__(self):
         super().__init__()
 
-        @self.server.feature(COLOR_PRESENTATION)
+        @self.server.feature(TEXT_DOCUMENT_COLOR_PRESENTATION)
         def f(params: ColorPresentationParams) -> List[ColorPresentation]:
             return [
                 ColorPresentation(
@@ -81,7 +81,7 @@ def test_capabilities():
 def test_color_presentation(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        COLOR_PRESENTATION,
+        TEXT_DOCUMENT_COLOR_PRESENTATION,
         ColorPresentationParams(
             text_document=TextDocumentIdentifier(uri="file://return.list"),
             color=Color(red=0.6, green=0.2, blue=0.3, alpha=0.5),

@@ -16,7 +16,7 @@
 ############################################################################
 from typing import Optional, Union
 
-from pygls.lsp.methods import (
+from pygls.lsp.types import (
     TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL,
 )
 from pygls.lsp.types import (

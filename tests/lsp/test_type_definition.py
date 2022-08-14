@@ -16,7 +16,7 @@
 ############################################################################
 from typing import List, Optional, Union
 
-from pygls.lsp.methods import TYPE_DEFINITION
+from pygls.lsp.types import TEXT_DOCUMENT_TYPE_DEFINITION
 from pygls.lsp.types import (
     Location,
     LocationLink,
@@ -35,7 +35,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            TYPE_DEFINITION,
+            TEXT_DOCUMENT_TYPE_DEFINITION,
             TypeDefinitionOptions(),
         )
         def f(
@@ -84,7 +84,7 @@ def test_capabilities(client_server):
 def test_type_definition_return_location(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        TYPE_DEFINITION,
+        TEXT_DOCUMENT_TYPE_DEFINITION,
         TypeDefinitionParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location"),
@@ -104,7 +104,7 @@ def test_type_definition_return_location(client_server):
 def test_type_definition_return_location_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        TYPE_DEFINITION,
+        TEXT_DOCUMENT_TYPE_DEFINITION,
         TypeDefinitionParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location_list"),
@@ -124,7 +124,7 @@ def test_type_definition_return_location_list(client_server):
 def test_type_definition_return_location_link_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        TYPE_DEFINITION,
+        TEXT_DOCUMENT_TYPE_DEFINITION,
         TypeDefinitionParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location_link_list"
@@ -155,7 +155,7 @@ def test_type_definition_return_location_link_list(client_server):
 def test_type_definition_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        TYPE_DEFINITION,
+        TEXT_DOCUMENT_TYPE_DEFINITION,
         TypeDefinitionParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             position=Position(line=0, character=0),

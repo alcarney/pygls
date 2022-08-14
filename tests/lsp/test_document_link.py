@@ -17,7 +17,7 @@
 
 from typing import List, Optional
 
-from pygls.lsp.methods import DOCUMENT_LINK
+from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_LINK
 from pygls.lsp.types import (
     DocumentLink,
     DocumentLinkOptions,
@@ -35,7 +35,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            DOCUMENT_LINK,
+            TEXT_DOCUMENT_DOCUMENT_LINK,
             DocumentLinkOptions(resolve_provider=True),
         )
         def f(params: DocumentLinkParams) -> Optional[List[DocumentLink]]:
@@ -68,7 +68,7 @@ def test_capabilities(client_server):
 def test_document_link_return_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_LINK,
+        TEXT_DOCUMENT_DOCUMENT_LINK,
         DocumentLinkParams(
             text_document=TextDocumentIdentifier(uri="file://return.list"),
         ),
@@ -89,7 +89,7 @@ def test_document_link_return_list(client_server):
 def test_document_link_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_LINK,
+        TEXT_DOCUMENT_DOCUMENT_LINK,
         DocumentLinkParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
         ),

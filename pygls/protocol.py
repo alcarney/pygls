@@ -40,26 +40,25 @@ from pygls.feature_manager import (FeatureManager, assign_help_attrs, get_help_a
                                    is_thread_function)
 from pygls.lsp import (JsonRPCNotification, JsonRPCRequestMessage, JsonRPCResponseMessage,
                        get_method_params_type, get_method_return_type)
-from pygls.lsp.methods import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
+from pygls.lsp.types import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
                                CLIENT_UNREGISTER_CAPABILITY, EXIT, INITIALIZE, INITIALIZED,
-                               LOG_TRACE_NOTIFICATION, SET_TRACE_NOTIFICATION, SHUTDOWN,
+                               LOG_TRACE, SET_TRACE, SHUTDOWN,
                                TEXT_DOCUMENT_DID_CHANGE, TEXT_DOCUMENT_DID_CLOSE,
                                TEXT_DOCUMENT_DID_OPEN, TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS,
                                WINDOW_LOG_MESSAGE, WINDOW_SHOW_DOCUMENT, WINDOW_SHOW_MESSAGE,
                                WORKSPACE_APPLY_EDIT, WORKSPACE_CONFIGURATION,
                                WORKSPACE_DID_CHANGE_WORKSPACE_FOLDERS, WORKSPACE_EXECUTE_COMMAND,
                                WORKSPACE_SEMANTIC_TOKENS_REFRESH)
-from pygls.lsp.types import (ApplyWorkspaceEditParams, ApplyWorkspaceEditResponse, Diagnostic,
+from pygls.lsp.types import (ApplyWorkspaceEditParams,
+                             ConfigurationParams, ConfigCallbackType, Diagnostic,
                              DidChangeTextDocumentParams, DidChangeWorkspaceFoldersParams,
                              DidCloseTextDocumentParams, DidOpenTextDocumentParams,
                              ExecuteCommandParams, InitializeParams, InitializeResult,
-                             LogMessageParams, MessageType, PublishDiagnosticsParams,
-                             RegistrationParams, ShowMessageParams, UnregistrationParams,
+                             LogMessageParams, LogTraceParams, MessageType, PublishDiagnosticsParams,
+                             RegistrationParams, ResponseErrorMessage, SetTraceParams,
+                             ShowDocumentParams, ShowMessageParams, ShowDocumentCallbackType,
+                             TraceValues, UnregistrationParams, WorkspaceApplyEditResponse,
                              WorkspaceEdit)
-from pygls.lsp.types.basic_structures import (ConfigCallbackType, LogTraceParams, SetTraceParams,
-                                              Trace)
-from pygls.lsp.types.window import ShowDocumentCallbackType, ShowDocumentParams
-from pygls.lsp.types.workspace import ConfigurationParams
 from pygls.uris import from_fs_path
 from pygls.workspace import Workspace
 
@@ -586,7 +585,7 @@ class LanguageServerProtocol(JsonRPCProtocol, metaclass=LSPMeta):
             if callable(attr) and hasattr(attr, 'method_name'):
                 self.fm.add_builtin_feature(attr.method_name, attr)
 
-    def apply_edit(self, edit: WorkspaceEdit, label: str = None) -> ApplyWorkspaceEditResponse:
+    def apply_edit(self, edit: WorkspaceEdit, label: str = None) -> WorkspaceApplyEditResponse:
         """Sends apply edit request to the client."""
         return self.send_request(WORKSPACE_APPLY_EDIT,
                                  ApplyWorkspaceEditParams(edit=edit, label=label))
@@ -628,7 +627,7 @@ class LanguageServerProtocol(JsonRPCProtocol, metaclass=LSPMeta):
         workspace_folders = params.workspace_folders or []
         self.workspace = Workspace(root_uri, self._server.sync_kind, workspace_folders)
 
-        self.trace = Trace.Off
+        self.trace = TraceValues.Off
 
         return InitializeResult(capabilities=self.server_capabilities)
 
@@ -667,7 +666,7 @@ class LanguageServerProtocol(JsonRPCProtocol, metaclass=LSPMeta):
         """Puts document to the workspace."""
         self.workspace.put_document(params.text_document)
 
-    @lsp_method(SET_TRACE_NOTIFICATION)
+    @lsp_method(SET_TRACE)
     def lsp_set_trace(self, params: SetTraceParams) -> None:
         """Changes server trace value."""
         self.trace = params.value
@@ -719,14 +718,14 @@ class LanguageServerProtocol(JsonRPCProtocol, metaclass=LSPMeta):
 
     def log_trace(self, message: str, verbose: Optional[str] = None) -> None:
         """Sends trace notification to the client."""
-        if self.trace == Trace.Off:
+        if self.trace == TraceValues.Off:
             return
 
         params = LogTraceParams(message=message)
-        if verbose and self.trace == Trace.Verbose:
+        if verbose and self.trace == TraceValues.VERBOSE:
             params.verbose = verbose
 
-        self.notify(LOG_TRACE_NOTIFICATION, params)
+        self.notify(LOG_TRACE, params)
 
     def publish_diagnostics(self, doc_uri: str, diagnostics: List[Diagnostic]) -> None:
         """Sends diagnostic notification to the client."""

@@ -17,7 +17,7 @@
 
 from typing import List, Optional
 
-from pygls.lsp.methods import FORMATTING
+from pygls.lsp.types import TEXT_DOCUMENT_FORMATTING
 from pygls.lsp.types import (
     DocumentFormattingOptions,
     DocumentFormattingParams,
@@ -36,7 +36,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            FORMATTING,
+            TEXT_DOCUMENT_FORMATTING,
             DocumentFormattingOptions(),
         )
         def f(params: DocumentFormattingParams) -> Optional[List[TextEdit]]:
@@ -66,7 +66,7 @@ def test_capabilities(client_server):
 def test_document_formatting_return_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        FORMATTING,
+        TEXT_DOCUMENT_FORMATTING,
         DocumentFormattingParams(
             text_document=TextDocumentIdentifier(uri="file://return.list"),
             options=FormattingOptions(
@@ -92,7 +92,7 @@ def test_document_formatting_return_list(client_server):
 def test_document_formatting_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        FORMATTING,
+        TEXT_DOCUMENT_FORMATTING,
         DocumentFormattingParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             options=FormattingOptions(

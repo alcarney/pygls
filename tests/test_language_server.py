@@ -20,7 +20,7 @@ from time import sleep
 import pytest
 
 from pygls import IS_PYODIDE
-from pygls.lsp.methods import (
+from pygls.lsp.types import (
     INITIALIZE,
     TEXT_DOCUMENT_DID_OPEN,
     WORKSPACE_EXECUTE_COMMAND,

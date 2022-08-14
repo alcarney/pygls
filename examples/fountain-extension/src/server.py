@@ -1,6 +1,6 @@
 import re
 from pygls.server import LanguageServer
-from pygls.lsp.methods import COMPLETION
+from pygls.lsp.types import TEXT_DOCUMENT_COMPLETION
 from pygls.lsp.types import (CompletionItem, CompletionParams, CompletionList, CompletionOptions)
 
 # The following imports are required for the glue code in 'server.ts'
@@ -12,7 +12,7 @@ server.start_pyodide()
 
 CHARACTER = re.compile(r"^[A-Z][A-Z ]+$", re.MULTILINE)
 
-@server.feature(COMPLETION, CompletionOptions(trigger_characters=['.']))
+@server.feature(TEXT_DOCUMENT_COMPLETION, CompletionOptions(trigger_characters=['.']))
 def on_completion(ls: LanguageServer, params: CompletionParams) -> CompletionList:
     """Completion suggestions for character names."""
 

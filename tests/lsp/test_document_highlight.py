@@ -17,7 +17,7 @@
 
 from typing import List, Optional
 
-from pygls.lsp.methods import DOCUMENT_HIGHLIGHT
+from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT
 from pygls.lsp.types import (
     DocumentHighlight,
     DocumentHighlightKind,
@@ -36,7 +36,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            DOCUMENT_HIGHLIGHT,
+            TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT,
             DocumentHighlightOptions(),
         )
         def f(
@@ -74,7 +74,7 @@ def test_capabilities(client_server):
 def test_document_highlight_return_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_HIGHLIGHT,
+        TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT,
         DocumentHighlightParams(
             text_document=TextDocumentIdentifier(uri="file://return.list"),
             position=Position(line=0, character=0),
@@ -93,14 +93,14 @@ def test_document_highlight_return_list(client_server):
     assert response[1]["range"]["start"]["character"] == 1
     assert response[1]["range"]["end"]["line"] == 2
     assert response[1]["range"]["end"]["character"] == 2
-    assert response[1]["kind"] == DocumentHighlightKind.Write
+    assert response[1]["kind"] == DocumentHighlightKind.Write.value
 
 
 @ConfiguredLS.decorate()
 def test_document_highlight_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_HIGHLIGHT,
+        TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT,
         DocumentHighlightParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             position=Position(line=0, character=0),

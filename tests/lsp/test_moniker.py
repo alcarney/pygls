@@ -17,7 +17,7 @@
 
 from typing import List, Optional
 
-from pygls.lsp.methods import TEXT_DOCUMENT_MONIKER
+from pygls.lsp.types import TEXT_DOCUMENT_MONIKER
 from pygls.lsp.types import (
     Moniker,
     MonikerKind,

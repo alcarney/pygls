@@ -17,7 +17,7 @@
 
 from typing import Optional
 
-from pygls.lsp.methods import TEXT_DOCUMENT_LINKED_EDITING_RANGE
+from pygls.lsp.types import TEXT_DOCUMENT_LINKED_EDITING_RANGE
 from pygls.lsp.types import (
     LinkedEditingRangeOptions,
     LinkedEditingRangeParams,

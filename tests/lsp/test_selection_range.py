@@ -16,7 +16,7 @@
 ############################################################################
 from typing import List, Optional
 
-from pygls.lsp.methods import SELECTION_RANGE
+from pygls.lsp.types import TEXT_DOCUMENT_SELECTION_RANGE
 from pygls.lsp.types import (
     Position,
     Range,
@@ -34,7 +34,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            SELECTION_RANGE,
+            TEXT_DOCUMENT_SELECTION_RANGE,
             SelectionRangeOptions(),
         )
         def f(params: SelectionRangeParams) -> Optional[List[SelectionRange]]:
@@ -71,9 +71,9 @@ def test_capabilities(client_server):
 def test_selection_range_return_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        SELECTION_RANGE,
+        TEXT_DOCUMENT_SELECTION_RANGE,
         SelectionRangeParams(
-            query="query",
+            # query="query",
             text_document=TextDocumentIdentifier(uri="file://return.list"),
             positions=[Position(line=0, character=0)],
         ),
@@ -99,9 +99,9 @@ def test_selection_range_return_list(client_server):
 def test_selection_range_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        SELECTION_RANGE,
+        TEXT_DOCUMENT_SELECTION_RANGE,
         SelectionRangeParams(
-            query="query",
+            # query="query",
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             positions=[Position(line=0, character=0)],
         ),

@@ -17,7 +17,7 @@
 
 from typing import List, Optional, Union
 
-from pygls.lsp.methods import DECLARATION
+from pygls.lsp.types import TEXT_DOCUMENT_DECLARATION
 from pygls.lsp.types import (
     DeclarationOptions,
     DeclarationParams,
@@ -35,7 +35,7 @@ class ConfiguredLS(ClientServer):
     def __init__(self):
         super().__init__()
 
-        @self.server.feature(DECLARATION, DeclarationOptions())
+        @self.server.feature(TEXT_DOCUMENT_DECLARATION, DeclarationOptions())
         def f(
             params: DeclarationParams,
         ) -> Optional[Union[Location, List[Location], List[LocationLink]]]:
@@ -82,7 +82,7 @@ def test_capabilities(client_server):
 def test_declaration_return_location(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DECLARATION,
+        TEXT_DOCUMENT_DECLARATION,
         DeclarationParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location"
@@ -103,7 +103,7 @@ def test_declaration_return_location(client_server):
 def test_declaration_return_location_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DECLARATION,
+        TEXT_DOCUMENT_DECLARATION,
         DeclarationParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location_list"),
@@ -123,7 +123,7 @@ def test_declaration_return_location_list(client_server):
 def test_declaration_return_location_link_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DECLARATION,
+        TEXT_DOCUMENT_DECLARATION,
         DeclarationParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location_link_list"
@@ -154,7 +154,7 @@ def test_declaration_return_location_link_list(client_server):
 def test_declaration_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DECLARATION,
+        TEXT_DOCUMENT_DECLARATION,
         DeclarationParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             position=Position(line=0, character=0),

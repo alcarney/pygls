@@ -17,7 +17,7 @@
 
 from typing import List
 
-from pygls.lsp.methods import DOCUMENT_COLOR
+from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_COLOR
 from pygls.lsp.types import (
     Color,
     ColorInformation,
@@ -36,7 +36,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            DOCUMENT_COLOR,
+            TEXT_DOCUMENT_DOCUMENT_COLOR,
             DocumentColorOptions(),
         )
         def f(params: DocumentColorParams) -> List[ColorInformation]:
@@ -63,7 +63,7 @@ def test_capabilities(client_server):
 def test_document_color(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_COLOR,
+        TEXT_DOCUMENT_DOCUMENT_COLOR,
         DocumentColorParams(
             text_document=TextDocumentIdentifier(uri="file://return.list")
         ),

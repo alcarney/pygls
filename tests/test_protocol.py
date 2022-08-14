@@ -22,10 +22,11 @@ from pathlib import Path
 from typing import Optional
 from unittest.mock import Mock
 
+import attrs
 import pytest
 
 from pygls.exceptions import JsonRpcException, JsonRpcInvalidParams
-from pygls.lsp import Model, get_method_params_type
+from pygls.lsp import get_method_params_type
 from pygls.lsp.types import (
     ClientCapabilities,
     CompletionItem,
@@ -46,8 +47,10 @@ from pygls.protocol import deserialize_message as _deserialize_message
 TEST_METHOD = "test_method"
 
 
-class FeatureParams(Model):
-    class InnerType(Model):
+@attrs.define
+class FeatureParams:
+    @attrs.define
+    class InnerType:
         inner_field: str
 
     field_a: str
@@ -55,7 +58,7 @@ class FeatureParams(Model):
 
 
 TEST_LSP_METHODS_MAP = {
-    TEST_METHOD: (None, FeatureParams, None),
+    TEST_METHOD: (None, None, FeatureParams, None),
 }
 
 deserialize_message = partial(
@@ -72,9 +75,9 @@ def test_deserialize_notification_message_valid_params():
         "jsonrpc": "2.0",
         "method": "test_method",
         "params": {
-            "field_a": "test_a",
-            "field_b": {
-                "inner_field": "test_inner"
+            "fieldA": "test_a",
+            "fieldB": {
+                "innerField": "test_inner"
             }
         }
     }
@@ -117,6 +120,7 @@ def test_deserialize_notification_message_bad_params_should_raise_error():
             ProgressParams(
                 token="id1",
                 value=WorkDoneProgressBegin(
+                    kind='begin',
                     title="Begin progress",
                     percentage=0,
                 ),
@@ -168,7 +172,6 @@ def test_deserialize_response_message():
     assert result.jsonrpc == "2.0"
     assert result.id == "id"
     assert result.result == "1"
-    assert result.error is None
 
 
 def test_deserialize_request_message_with_registered_type():
@@ -178,9 +181,9 @@ def test_deserialize_request_message_with_registered_type():
         "id": "id",
         "method": "test_method",
         "params": {
-            "field_a": "test_a",
-            "field_b": {
-                "inner_field": "test_inner"
+            "fieldA": "test_a",
+            "fieldB": {
+                "innerField": "test_inner"
             }
         }
     }

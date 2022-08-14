@@ -17,7 +17,7 @@
 
 from typing import List, Optional, Union
 
-from pygls.lsp.methods import DEFINITION
+from pygls.lsp.types import TEXT_DOCUMENT_DEFINITION
 from pygls.lsp.types import (
     DefinitionOptions,
     DefinitionParams,
@@ -36,7 +36,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            DEFINITION,
+            TEXT_DOCUMENT_DEFINITION,
             DefinitionOptions(),
         )
         def f(
@@ -85,7 +85,7 @@ def test_capabilities(client_server):
 def test_definition_return_location(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DEFINITION,
+        TEXT_DOCUMENT_DEFINITION,
         DefinitionParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location"),
@@ -105,7 +105,7 @@ def test_definition_return_location(client_server):
 def test_definition_return_location_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DEFINITION,
+        TEXT_DOCUMENT_DEFINITION,
         DefinitionParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location_list"),
@@ -125,7 +125,7 @@ def test_definition_return_location_list(client_server):
 def test_definition_return_location_link_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DEFINITION,
+        TEXT_DOCUMENT_DEFINITION,
         DefinitionParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.location_link_list"
@@ -156,7 +156,7 @@ def test_definition_return_location_link_list(client_server):
 def test_definition_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DEFINITION,
+        TEXT_DOCUMENT_DEFINITION,
         DefinitionParams(
             text_document=TextDocumentIdentifier(uri="file://return.none"),
             position=Position(line=0, character=0),

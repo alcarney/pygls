@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and      #
 # limitations under the License.                                           #
 ############################################################################
-from pygls.lsp.methods import COMPLETION
+from pygls.lsp.types import TEXT_DOCUMENT_COMPLETION
 from pygls.lsp.types import (
     CompletionItem,
     CompletionItemKind,
@@ -33,7 +33,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            COMPLETION,
+            TEXT_DOCUMENT_COMPLETION,
             CompletionOptions(
                 trigger_characters=[","],
                 all_commit_characters=[":"],
@@ -68,7 +68,7 @@ def test_capabilities(client_server):
 def test_completions(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        COMPLETION,
+        TEXT_DOCUMENT_COMPLETION,
         CompletionParams(
             text_document=TextDocumentIdentifier(uri="file://test.test"),
             position=Position(line=0, character=0),
@@ -77,7 +77,7 @@ def test_completions(client_server):
 
     assert not response["isIncomplete"]
     assert response["items"][0]["label"] == "test1"
-    assert response["items"][0]["kind"] == CompletionItemKind.Method
+    assert response["items"][0]["kind"] == CompletionItemKind.Method.value
     assert response["items"][0]["preselect"]
     assert "deprecated" not in response["items"][0]
     assert "tags" not in response["items"][0]

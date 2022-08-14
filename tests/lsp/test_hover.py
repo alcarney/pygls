@@ -17,12 +17,12 @@
 
 from typing import Optional
 
-from pygls.lsp.methods import HOVER
+from pygls.lsp.types import TEXT_DOCUMENT_HOVER
 from pygls.lsp.types import (
     Hover,
     HoverOptions,
     HoverParams,
-    MarkedString,
+    MarkedString_Type1,
     MarkupContent,
     MarkupKind,
     Position,
@@ -38,7 +38,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            HOVER,
+            TEXT_DOCUMENT_HOVER,
             HoverOptions(),
         )
         def f(params: HoverParams) -> Optional[Hover]:
@@ -50,7 +50,7 @@ class ConfiguredLS(ClientServer):
             return {
                 "file://return.marked_string": Hover(
                     range=range,
-                    contents=MarkedString(
+                    contents=MarkedString_Type1(
                         language="language",
                         value="value",
                     ),
@@ -58,7 +58,7 @@ class ConfiguredLS(ClientServer):
                 "file://return.marked_string_list": Hover(
                     range=range,
                     contents=[
-                        MarkedString(
+                        MarkedString_Type1(
                             language="language",
                             value="value",
                         ),
@@ -85,7 +85,7 @@ def test_capabilities(client_server):
 def test_hover_return_marked_string(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        HOVER,
+        TEXT_DOCUMENT_HOVER,
         HoverParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.marked_string"),
@@ -108,7 +108,7 @@ def test_hover_return_marked_string(client_server):
 def test_hover_return_marked_string_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        HOVER,
+        TEXT_DOCUMENT_HOVER,
         HoverParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.marked_string_list"
@@ -133,7 +133,7 @@ def test_hover_return_marked_string_list(client_server):
 def test_hover_return_markup_content(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        HOVER,
+        TEXT_DOCUMENT_HOVER,
         HoverParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.markup_content"
@@ -144,7 +144,7 @@ def test_hover_return_markup_content(client_server):
 
     assert response
 
-    assert response["contents"]["kind"] == MarkupKind.Markdown
+    assert response["contents"]["kind"] == MarkupKind.Markdown.value
     assert response["contents"]["value"] == "value"
 
     assert response["range"]["start"]["line"] == 0

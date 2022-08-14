@@ -17,7 +17,7 @@
 
 from typing import List, Union
 
-from pygls.lsp.methods import DOCUMENT_SYMBOL
+from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_SYMBOL
 from pygls.lsp.types import (
     DocumentSymbol,
     DocumentSymbolOptions,
@@ -38,7 +38,7 @@ class ConfiguredLS(ClientServer):
         super().__init__()
 
         @self.server.feature(
-            DOCUMENT_SYMBOL,
+            TEXT_DOCUMENT_DOCUMENT_SYMBOL,
             DocumentSymbolOptions(),
         )
         def f(
@@ -105,7 +105,7 @@ def test_capabilities(client_server):
 def test_document_symbol_return_symbol_information_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_SYMBOL,
+        TEXT_DOCUMENT_DOCUMENT_SYMBOL,
         DocumentSymbolParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.symbol_information_list"
@@ -116,7 +116,7 @@ def test_document_symbol_return_symbol_information_list(client_server):
     assert response
 
     assert response[0]["name"] == "symbol"
-    assert response[0]["kind"] == SymbolKind.Namespace
+    assert response[0]["kind"] == SymbolKind.Namespace.value
     assert response[0]["location"]["uri"] == "uri"
     assert response[0]["location"]["range"]["start"]["line"] == 0
     assert response[0]["location"]["range"]["start"]["character"] == 0
@@ -130,7 +130,7 @@ def test_document_symbol_return_symbol_information_list(client_server):
 def test_document_symbol_return_document_symbol_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
-        DOCUMENT_SYMBOL,
+        TEXT_DOCUMENT_DOCUMENT_SYMBOL,
         DocumentSymbolParams(
             text_document=TextDocumentIdentifier(
                 uri="file://return.document_symbol_list"
@@ -141,7 +141,7 @@ def test_document_symbol_return_document_symbol_list(client_server):
     assert response
 
     assert response[0]["name"] == "symbol"
-    assert response[0]["kind"] == SymbolKind.Object
+    assert response[0]["kind"] == SymbolKind.Object.value
     assert response[0]["range"]["start"]["line"] == 0
     assert response[0]["range"]["start"]["character"] == 0
     assert response[0]["range"]["end"]["line"] == 10
@@ -154,7 +154,7 @@ def test_document_symbol_return_document_symbol_list(client_server):
     assert response[0]["deprecated"]
 
     assert response[0]["children"][0]["name"] == "inner_symbol"
-    assert response[0]["children"][0]["kind"] == SymbolKind.Number
+    assert response[0]["children"][0]["kind"] == SymbolKind.Number.value
     assert response[0]["children"][0]["range"]["start"]["line"] == 0
     assert response[0]["children"][0]["range"]["start"]["character"] == 0
     assert response[0]["children"][0]["range"]["end"]["line"] == 1

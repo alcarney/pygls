@@ -20,8 +20,13 @@ import os
 import threading
 
 import pytest
-from pygls.lsp.methods import EXIT, INITIALIZE, SHUTDOWN
-from pygls.lsp.types import ClientCapabilities, InitializeParams
+from pygls.lsp.types import (
+    EXIT,
+    INITIALIZE,
+    SHUTDOWN,
+    ClientCapabilities,
+    InitializeParams
+)
 from pygls.protocol import deserialize_message
 
 from pygls.server import LanguageServer
