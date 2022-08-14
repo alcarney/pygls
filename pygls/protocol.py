@@ -23,10 +23,12 @@ import re
 import sys
 import traceback
 import uuid
+from cattrs.errors import ClassValidationError
 from collections import namedtuple
 from concurrent.futures import Future
 from functools import partial
 from itertools import zip_longest
+from lsprotocol import converters
 from typing import Callable, List, Optional
 
 from pygls.capabilities import ServerCapabilitiesBuilder
@@ -37,7 +39,7 @@ from pygls.exceptions import (JsonRpcException, JsonRpcInternalError, JsonRpcInv
 from pygls.feature_manager import (FeatureManager, assign_help_attrs, get_help_attrs,
                                    is_thread_function)
 from pygls.lsp import (JsonRPCNotification, JsonRPCRequestMessage, JsonRPCResponseMessage,
-                       get_method_params_type, get_method_return_type, is_instance)
+                       get_method_params_type, get_method_return_type)
 from pygls.lsp.methods import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
                                CLIENT_UNREGISTER_CAPABILITY, EXIT, INITIALIZE, INITIALIZED,
                                LOG_TRACE_NOTIFICATION, SET_TRACE_NOTIFICATION, SHUTDOWN,
@@ -62,7 +64,7 @@ from pygls.uris import from_fs_path
 from pygls.workspace import Workspace
 
 logger = logging.getLogger(__name__)
-
+converter = converters.get_converter()
 
 def call_user_feature(base_func, method_name):
     """Wraps generic LSP features and calls user registered feature
@@ -97,8 +99,13 @@ def dict_to_object(**d):
 
 def default_serializer(o):
     """JSON serializer for complex objects that do not extend pydantic BaseModel class."""
+
+    if hasattr(o, '__attrs_attrs__'):
+        return converter.unstructure(o)
+
     if isinstance(o, enum.Enum):
         return o.value
+
     return o.__dict__
 
 
@@ -126,19 +133,21 @@ def deserialize_params(data, get_params_type):
 
         try:
             params_type = get_params_type(method)
+
             if params_type is None:
-                params_type = dict_to_object
-            elif params_type.__name__ == ExecuteCommandParams.__name__:
-                params = deserialize_command(params)
+                data['params'] = dict_to_object(**params)
+
+            else:
+                data['params'] = converter.structure(params, params_type)
 
         except MethodTypeNotRegisteredError:
-            params_type = dict_to_object
+            data['params'] = dict_to_object(**params)
 
-        try:
-            data['params'] = params_type(**params)
-        except TypeError:
+        except ClassValidationError as exc:
             raise ValueError(
-                f'Could not instantiate "{params_type.__name__}" from params: {params}')
+                f'Could not instantiate "{params_type.__name__}" from params: {params}'
+            ) from exc
+
     except KeyError:
         pass
 
@@ -156,6 +165,8 @@ def deserialize_message(data, get_params_type=get_method_params_type):
         if 'id' in data:
             if 'method' in data:
                 return JsonRPCRequestMessage(**data)
+            elif 'error' in data:
+                return converter.structure(data, ResponseErrorMessage)
             else:
                 return JsonRPCResponseMessage(**data)
         else:
@@ -205,11 +216,9 @@ class JsonRPCProtocol(asyncio.Protocol):
         """Check if registered feature returns appropriate result type."""
         if method_type == ATTR_FEATURE_TYPE:
             return_type = get_method_return_type(method_name)
-            if not is_instance(result, return_type):
-                error = JsonRpcInternalError().to_dict()
-                self._send_response(msg_id, error=error)
-
-        self._send_response(msg_id, result=result)
+            self._send_data(return_type(id=msg_id, result=result))
+        else:
+            self._send_response(msg_id, result=result)
 
     def _execute_notification(self, handler, *params):
         """Executes notification message handler."""
@@ -348,7 +357,7 @@ class JsonRPCProtocol(asyncio.Protocol):
 
         if error is not None:
             logger.debug('Received error response to message "%s": %s', msg_id, error)
-            future.set_exception(JsonRpcException.from_dict(error))
+            future.set_exception(JsonRpcException.from_error(error))
         else:
             logger.debug('Received result for message "%s": %s', msg_id, result)
             future.set_result(result)
@@ -368,7 +377,10 @@ class JsonRPCProtocol(asyncio.Protocol):
             self._handle_notification(message.method, message.params)
         elif isinstance(message, JsonRPCResponseMessage):
             logger.debug('Response message received.')
-            self._handle_response(message.id, message.result, message.error)
+            self._handle_response(message.id, message.result)
+        elif isinstance(message, ResponseErrorMessage):
+            logger.debug('Response message received.')
+            self._handle_response(message.id, None, message.error)
         elif isinstance(message, JsonRPCRequestMessage):
             logger.debug('Request message received.')
             self._handle_request(message.id, message.method, message.params)
@@ -379,7 +391,7 @@ class JsonRPCProtocol(asyncio.Protocol):
             return
 
         try:
-            body = data.json(by_alias=True, exclude_unset=True, encoder=default_serializer)
+            body = json.dumps(data, default=default_serializer)
             logger.info('Sending data: %s', body)
 
             body = body.encode(self.CHARSET)
@@ -403,15 +415,16 @@ class JsonRPCProtocol(asyncio.Protocol):
             result(any): Result returned by handler
             error(any): Error returned by handler
         """
-        response = JsonRPCResponseMessage(id=msg_id,
-                                          jsonrpc=JsonRPCProtocol.VERSION,
-                                          result=result,
-                                          error=error)
 
-        if error is None:
-            del response.error
+        if error is not None:
+            response = ResponseErrorMessage(id=msg_id, error=error)
+
         else:
-            del response.result
+            response = JsonRPCResponseMessage(
+                id=msg_id,
+                jsonrpc=JsonRPCProtocol.VERSION,
+                result=result
+            )
 
         self._send_data(response)
 
@@ -603,7 +616,10 @@ class LanguageServerProtocol(JsonRPCProtocol, metaclass=LSPMeta):
             list(self.fm.commands.keys()),
             self._server.sync_kind,
         ).build()
-        logger.debug('Server capabilities: %s', self.server_capabilities.dict())
+        logger.debug(
+            'Server capabilities: %s',
+            json.dumps(self.server_capabilities, default=default_serializer)
+        )
 
         root_path = params.root_path
         root_uri = params.root_uri or from_fs_path(root_path)
