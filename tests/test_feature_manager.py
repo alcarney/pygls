@@ -23,8 +23,7 @@ from pygls.exceptions import (
     ValidationError,
 )
 from pygls.feature_manager import has_ls_param_or_annotation, wrap_with_server
-from pygls.lsp import types
-from pygls.lsp.types import CompletionOptions
+from lsprotocol import types
 
 
 def test_has_ls_param_or_annotation():
@@ -72,7 +71,7 @@ def test_register_commands(feature_manager):
 
 
 def test_register_feature_with_valid_options(feature_manager):
-    options = CompletionOptions(trigger_characters=["!"])
+    options = types.CompletionOptions(trigger_characters=["!"])
 
     @feature_manager.feature(types.TEXT_DOCUMENT_COMPLETION, options)
     def completions():

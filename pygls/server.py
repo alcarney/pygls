@@ -24,9 +24,10 @@ from threading import Event
 from typing import Any, Callable, List, Optional, TypeVar
 
 from pygls import IS_WIN, IS_PYODIDE
-from pygls.lsp.types import (WorkspaceApplyEditResponse, ClientCapabilities, ConfigCallbackType,
+from pygls.lsp import ConfigCallbackType, ShowDocumentCallbackType
+from lsprotocol.types import (WorkspaceApplyEditResponse, ClientCapabilities,
                              ConfigurationParams, Diagnostic, MessageType, RegistrationParams,
-                             ServerCapabilities, ShowDocumentCallbackType, ShowDocumentParams,
+                             ServerCapabilities, ShowDocumentParams,
                              TextDocumentSyncKind, UnregistrationParams,
                              WorkspaceEdit)
 from pygls.progress import Progress

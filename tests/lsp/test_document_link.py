@@ -17,8 +17,8 @@
 
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_LINK
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_DOCUMENT_LINK
+from lsprotocol.types import (
     DocumentLink,
     DocumentLinkOptions,
     DocumentLinkParams,

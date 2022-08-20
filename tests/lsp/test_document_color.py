@@ -17,8 +17,8 @@
 
 from typing import List
 
-from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_COLOR
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_DOCUMENT_COLOR
+from lsprotocol.types import (
     Color,
     ColorInformation,
     DocumentColorOptions,

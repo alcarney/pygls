@@ -17,8 +17,8 @@
 
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_RANGE_FORMATTING
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_RANGE_FORMATTING
+from lsprotocol.types import (
     DocumentRangeFormattingOptions,
     DocumentRangeFormattingParams,
     FormattingOptions,

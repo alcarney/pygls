@@ -18,8 +18,8 @@
 from typing import List, Optional
 
 import time
-from pygls.lsp.types import TEXT_DOCUMENT_CODE_LENS, PROGRESS
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_CODE_LENS, PROGRESS
+from lsprotocol.types import (
     CodeLens,
     CodeLensParams,
     CodeLensOptions,

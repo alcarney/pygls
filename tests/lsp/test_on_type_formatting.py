@@ -17,8 +17,8 @@
 
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_ON_TYPE_FORMATTING
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_ON_TYPE_FORMATTING
+from lsprotocol.types import (
     DocumentOnTypeFormattingOptions,
     DocumentOnTypeFormattingParams,
     FormattingOptions,

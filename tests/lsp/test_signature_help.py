@@ -19,8 +19,8 @@ from typing import Optional
 
 import pytest
 
-from pygls.lsp.types import TEXT_DOCUMENT_SIGNATURE_HELP
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_SIGNATURE_HELP
+from lsprotocol.types import (
     ParameterInformation,
     Position,
     SignatureHelp,

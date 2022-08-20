@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and      #
 # limitations under the License.                                           #
 ############################################################################
-from pygls.lsp.types import TEXT_DOCUMENT_COMPLETION
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_COMPLETION
+from lsprotocol.types import (
     CompletionItem,
     CompletionItemKind,
     CompletionList,

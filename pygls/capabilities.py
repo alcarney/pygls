@@ -17,7 +17,7 @@
 from functools import reduce
 from typing import Any
 
-from pygls.lsp.types import (
+from lsprotocol.types import (
     TEXT_DOCUMENT_CODE_ACTION, TEXT_DOCUMENT_CODE_LENS,
     TEXT_DOCUMENT_COMPLETION, TEXT_DOCUMENT_DECLARATION,
     TEXT_DOCUMENT_DEFINITION, TEXT_DOCUMENT_DOCUMENT_COLOR,
@@ -38,7 +38,7 @@ from pygls.lsp.types import (
     WORKSPACE_SYMBOL, WORKSPACE_WILL_CREATE_FILES,
     WORKSPACE_WILL_DELETE_FILES, WORKSPACE_WILL_RENAME_FILES
 )
-from pygls.lsp.types import (ClientCapabilities, CodeLensOptions, CompletionOptions,
+from lsprotocol.types import (ClientCapabilities, CodeLensOptions, CompletionOptions,
                              DocumentLinkOptions, ExecuteCommandOptions, ImplementationOptions,
                              SaveOptions, SemanticTokensOptions, SemanticTokensRegistrationOptions,
                              SemanticTokensOptionsFullType1, ServerCapabilities,

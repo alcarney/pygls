@@ -20,7 +20,7 @@ import os
 import threading
 
 import pytest
-from pygls.lsp.types import (
+from lsprotocol.types import (
     EXIT,
     INITIALIZE,
     SHUTDOWN,

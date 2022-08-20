@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and      #
 # limitations under the License.                                           #
 ############################################################################
-from typing import Any, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 import attrs
 from lsprotocol.types import (
@@ -24,11 +24,15 @@ from lsprotocol.types import (
     TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL_DELTA,
     TEXT_DOCUMENT_SEMANTIC_TOKENS_RANGE,
     SemanticTokensLegend,
-    SemanticTokensRegistrationOptions
+    SemanticTokensRegistrationOptions,
+    ShowDocumentResult
 )
 from typeguard import check_type
 
 from pygls.exceptions import MethodTypeNotRegisteredError
+
+ConfigCallbackType = Callable[[List[Any]], None]
+ShowDocumentCallbackType = Callable[[ShowDocumentResult], None]
 
 METHOD_TO_OPTIONS = {
     TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL:  Union[SemanticTokensLegend, SemanticTokensRegistrationOptions],

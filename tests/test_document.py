@@ -18,7 +18,7 @@
 ############################################################################
 import re
 
-from pygls.lsp.types import (
+from lsprotocol.types import (
     Position,
     Range,
     TextDocumentContentChangeEvent_Type1,

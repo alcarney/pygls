@@ -16,8 +16,8 @@
 ############################################################################
 from typing import List, Optional, Union
 
-from pygls.lsp.types import TEXT_DOCUMENT_TYPE_DEFINITION
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_TYPE_DEFINITION
+from lsprotocol.types import (
     Location,
     LocationLink,
     Position,

@@ -1,7 +1,7 @@
 import re
 from pygls.server import LanguageServer
-from pygls.lsp.types import TEXT_DOCUMENT_COMPLETION
-from pygls.lsp.types import (CompletionItem, CompletionParams, CompletionList, CompletionOptions)
+from lsprotocol.types import TEXT_DOCUMENT_COMPLETION
+from lsprotocol.types import (CompletionItem, CompletionParams, CompletionList, CompletionOptions)
 
 # The following imports are required for the glue code in 'server.ts'
 import json

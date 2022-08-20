@@ -16,8 +16,8 @@
 ############################################################################
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_SELECTION_RANGE
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_SELECTION_RANGE
+from lsprotocol.types import (
     Position,
     Range,
     SelectionRange,

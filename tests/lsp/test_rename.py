@@ -17,8 +17,8 @@
 
 from typing import Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_RENAME
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_RENAME
+from lsprotocol.types import (
     CreateFile,
     CreateFileOptions,
     DeleteFile,

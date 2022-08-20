@@ -38,9 +38,10 @@ from pygls.exceptions import (JsonRpcException, JsonRpcInternalError, JsonRpcInv
                               MethodTypeNotRegisteredError)
 from pygls.feature_manager import (FeatureManager, assign_help_attrs, get_help_attrs,
                                    is_thread_function)
-from pygls.lsp import (JsonRPCNotification, JsonRPCRequestMessage, JsonRPCResponseMessage,
+from pygls.lsp import (ConfigCallbackType, ShowDocumentCallbackType,
+                       JsonRPCNotification, JsonRPCRequestMessage, JsonRPCResponseMessage,
                        get_method_params_type, get_method_return_type)
-from pygls.lsp.types import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
+from lsprotocol.types import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
                                CLIENT_UNREGISTER_CAPABILITY, EXIT, INITIALIZE, INITIALIZED,
                                LOG_TRACE, SET_TRACE, SHUTDOWN,
                                TEXT_DOCUMENT_DID_CHANGE, TEXT_DOCUMENT_DID_CLOSE,
@@ -49,14 +50,14 @@ from pygls.lsp.types import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
                                WORKSPACE_APPLY_EDIT, WORKSPACE_CONFIGURATION,
                                WORKSPACE_DID_CHANGE_WORKSPACE_FOLDERS, WORKSPACE_EXECUTE_COMMAND,
                                WORKSPACE_SEMANTIC_TOKENS_REFRESH)
-from pygls.lsp.types import (ApplyWorkspaceEditParams,
-                             ConfigurationParams, ConfigCallbackType, Diagnostic,
+from lsprotocol.types import (ApplyWorkspaceEditParams,
+                             ConfigurationParams, Diagnostic,
                              DidChangeTextDocumentParams, DidChangeWorkspaceFoldersParams,
                              DidCloseTextDocumentParams, DidOpenTextDocumentParams,
                              ExecuteCommandParams, InitializeParams, InitializeResult,
                              LogMessageParams, LogTraceParams, MessageType, PublishDiagnosticsParams,
                              RegistrationParams, ResponseErrorMessage, SetTraceParams,
-                             ShowDocumentParams, ShowMessageParams, ShowDocumentCallbackType,
+                             ShowDocumentParams, ShowMessageParams,
                              TraceValues, UnregistrationParams, WorkspaceApplyEditResponse,
                              WorkspaceEdit)
 from pygls.uris import from_fs_path

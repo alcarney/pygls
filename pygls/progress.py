@@ -2,9 +2,9 @@ import asyncio
 from concurrent.futures import Future
 from typing import Dict
 
-from pygls.lsp.types import (PROGRESS, WINDOW_WORK_DONE_PROGRESS_CANCEL,
+from lsprotocol.types import (PROGRESS, WINDOW_WORK_DONE_PROGRESS_CANCEL,
                                WINDOW_WORK_DONE_PROGRESS_CREATE)
-from pygls.lsp.types import (ProgressParams, ProgressToken, WorkDoneProgressBegin,
+from lsprotocol.types import (ProgressParams, ProgressToken, WorkDoneProgressBegin,
                              WorkDoneProgressEnd, WorkDoneProgressReport,
                              WorkDoneProgressCancelParams, WorkDoneProgressCreateParams)
 from pygls.protocol import LanguageServerProtocol

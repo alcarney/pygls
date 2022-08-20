@@ -17,8 +17,8 @@
 
 from typing import List, Optional, Union
 
-from pygls.lsp.types import TEXT_DOCUMENT_IMPLEMENTATION
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_IMPLEMENTATION
+from lsprotocol.types import (
     ImplementationOptions,
     ImplementationParams,
     Location,

@@ -17,8 +17,8 @@
 
 from typing import Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_HOVER
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_HOVER
+from lsprotocol.types import (
     Hover,
     HoverOptions,
     HoverParams,

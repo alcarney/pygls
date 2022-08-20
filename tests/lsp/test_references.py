@@ -17,8 +17,8 @@
 
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_REFERENCES
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_REFERENCES
+from lsprotocol.types import (
     Location,
     Position,
     Range,

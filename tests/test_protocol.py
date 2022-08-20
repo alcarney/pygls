@@ -27,7 +27,7 @@ import pytest
 
 from pygls.exceptions import JsonRpcException, JsonRpcInvalidParams
 from pygls.lsp import get_method_params_type
-from pygls.lsp.types import (
+from lsprotocol.types import (
     ClientCapabilities,
     CompletionItem,
     CompletionItemKind,

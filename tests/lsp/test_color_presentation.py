@@ -17,8 +17,8 @@
 
 from typing import List
 
-from pygls.lsp.types import TEXT_DOCUMENT_COLOR_PRESENTATION
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_COLOR_PRESENTATION
+from lsprotocol.types import (
     Color,
     ColorPresentation,
     ColorPresentationParams,

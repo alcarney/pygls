@@ -20,12 +20,12 @@ from time import sleep
 import pytest
 
 from pygls import IS_PYODIDE
-from pygls.lsp.types import (
+from lsprotocol.types import (
     INITIALIZE,
     TEXT_DOCUMENT_DID_OPEN,
     WORKSPACE_EXECUTE_COMMAND,
 )
-from pygls.lsp.types import (
+from lsprotocol.types import (
     ClientCapabilities,
     DidOpenTextDocumentParams,
     ExecuteCommandParams,

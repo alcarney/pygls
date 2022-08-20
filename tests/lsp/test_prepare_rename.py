@@ -17,8 +17,8 @@
 
 from typing import Optional, Union
 
-from pygls.lsp.types import TEXT_DOCUMENT_PREPARE_RENAME
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_PREPARE_RENAME
+from lsprotocol.types import (
     Position,
     PrepareRenameResult,
     PrepareRenameResult_Type1,

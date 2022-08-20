@@ -22,7 +22,7 @@ import os
 import re
 from typing import List, Optional, Pattern
 
-from pygls.lsp.types import (Position, Range, TextDocumentContentChangeEvent,
+from lsprotocol.types import (Position, Range, TextDocumentContentChangeEvent,
                              TextDocumentItem, TextDocumentSyncKind,
                              VersionedTextDocumentIdentifier, WorkspaceFolder)
 from pygls.uris import to_fs_path, uri_scheme

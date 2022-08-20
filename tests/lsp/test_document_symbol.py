@@ -17,8 +17,8 @@
 
 from typing import List, Union
 
-from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_SYMBOL
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_DOCUMENT_SYMBOL
+from lsprotocol.types import (
     DocumentSymbol,
     DocumentSymbolOptions,
     DocumentSymbolParams,

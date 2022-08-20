@@ -17,8 +17,8 @@
 
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT
+from lsprotocol.types import (
     DocumentHighlight,
     DocumentHighlightKind,
     DocumentHighlightOptions,

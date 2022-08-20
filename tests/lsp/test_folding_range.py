@@ -17,8 +17,8 @@
 
 from typing import List, Optional
 
-from pygls.lsp.types import TEXT_DOCUMENT_FOLDING_RANGE
-from pygls.lsp.types import (
+from lsprotocol.types import TEXT_DOCUMENT_FOLDING_RANGE
+from lsprotocol.types import (
     FoldingRange,
     FoldingRangeKind,
     FoldingRangeOptions,

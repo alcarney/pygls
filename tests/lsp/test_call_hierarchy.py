@@ -16,12 +16,12 @@
 ############################################################################
 from typing import List, Optional
 
-from pygls.lsp.types import (
+from lsprotocol.types import (
     CALL_HIERARCHY_INCOMING_CALLS,
     CALL_HIERARCHY_OUTGOING_CALLS,
     TEXT_DOCUMENT_PREPARE_CALL_HIERARCHY
 )
-from pygls.lsp.types import (
+from lsprotocol.types import (
     CallHierarchyIncomingCall, CallHierarchyIncomingCallsParams,
     CallHierarchyItem, CallHierarchyOptions, CallHierarchyOutgoingCall,
     CallHierarchyOutgoingCallsParams, CallHierarchyPrepareParams,

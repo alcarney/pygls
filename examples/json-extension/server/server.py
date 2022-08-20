@@ -22,10 +22,10 @@ import uuid
 from json import JSONDecodeError
 from typing import Optional
 
-from pygls.lsp.types import (TEXT_DOCUMENT_COMPLETION, TEXT_DOCUMENT_DID_CHANGE,
+from lsprotocol.types import (TEXT_DOCUMENT_COMPLETION, TEXT_DOCUMENT_DID_CHANGE,
                                TEXT_DOCUMENT_DID_CLOSE, TEXT_DOCUMENT_DID_OPEN,
                                TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL)
-from pygls.lsp.types import (CompletionItem, CompletionList, CompletionOptions,
+from lsprotocol.types import (CompletionItem, CompletionList, CompletionOptions,
                              CompletionParams, ConfigurationItem,
                              ConfigurationParams, Diagnostic,
                              DidChangeTextDocumentParams,
