@@ -71,18 +71,16 @@ def test_code_lens_return_list(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
         TEXT_DOCUMENT_CODE_LENS,
-        CodeLensParams(
-            text_document=TextDocumentIdentifier(uri="file://return.list")
-        ),
+        CodeLensParams(text_document=TextDocumentIdentifier(uri="file://return.list")),
     ).result()
 
-    assert response[0]["data"] == "some data"
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
-    assert response[0]["command"]["title"] == "cmd1"
-    assert response[0]["command"]["command"] == "cmd1"
+    assert response[0].data == "some data"
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
+    assert response[0].command.title == "cmd1"
+    assert response[0].command.command == "cmd1"
 
 
 @ConfiguredLS.decorate()
@@ -90,9 +88,7 @@ def test_code_lens_return_none(client_server):
     client, _ = client_server
     response = client.lsp.send_request(
         TEXT_DOCUMENT_CODE_LENS,
-        CodeLensParams(
-            text_document=TextDocumentIdentifier(uri="file://return.none")
-        ),
+        CodeLensParams(text_document=TextDocumentIdentifier(uri="file://return.none")),
     ).result()
 
     assert response is None

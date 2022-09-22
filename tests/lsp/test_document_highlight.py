@@ -39,9 +39,7 @@ class ConfiguredLS(ClientServer):
             TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT,
             DocumentHighlightOptions(),
         )
-        def f(
-            params: DocumentHighlightParams
-        ) -> Optional[List[DocumentHighlight]]:
+        def f(params: DocumentHighlightParams) -> Optional[List[DocumentHighlight]]:
             if params.text_document.uri == "file://return.list":
                 return [
                     DocumentHighlight(
@@ -83,17 +81,17 @@ def test_document_highlight_return_list(client_server):
 
     assert response
 
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
-    assert "kind" not in response[0]
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
+    assert response[0].kind is None
 
-    assert response[1]["range"]["start"]["line"] == 1
-    assert response[1]["range"]["start"]["character"] == 1
-    assert response[1]["range"]["end"]["line"] == 2
-    assert response[1]["range"]["end"]["character"] == 2
-    assert response[1]["kind"] == DocumentHighlightKind.Write.value
+    assert response[1].range.start.line == 1
+    assert response[1].range.start.character == 1
+    assert response[1].range.end.line == 2
+    assert response[1].range.end.character == 2
+    assert response[1].kind == DocumentHighlightKind.Write
 
 
 @ConfiguredLS.decorate()

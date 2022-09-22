@@ -75,21 +75,21 @@ def test_completions(client_server):
         ),
     ).result()
 
-    assert not response["isIncomplete"]
-    assert response["items"][0]["label"] == "test1"
-    assert response["items"][0]["kind"] == CompletionItemKind.Method.value
-    assert response["items"][0]["preselect"]
-    assert "deprecated" not in response["items"][0]
-    assert "tags" not in response["items"][0]
-    assert "detail" not in response["items"][0]
-    assert "documentation" not in response["items"][0]
-    assert "sort_text" not in response["items"][0]
-    assert "filter_text" not in response["items"][0]
-    assert "insert_text" not in response["items"][0]
-    assert "insert_text_format" not in response["items"][0]
-    assert "insert_text_mode" not in response["items"][0]
-    assert "text_edit" not in response["items"][0]
-    assert "additional_text_edits" not in response["items"][0]
-    assert "commit_characters" not in response["items"][0]
-    assert "command" not in response["items"][0]
-    assert "data" not in response["items"][0]
+    assert not response.is_incomplete
+    assert response.items[0].label == "test1"
+    assert response.items[0].kind == CompletionItemKind.Method
+    assert response.items[0].preselect
+    assert response.items[0].deprecated is None
+    assert response.items[0].tags is None
+    assert response.items[0].detail is None
+    assert response.items[0].documentation is None
+    assert response.items[0].sort_text is None
+    assert response.items[0].filter_text is None
+    assert response.items[0].insert_text is None
+    assert response.items[0].insert_text_format is None
+    assert response.items[0].insert_text_mode is None
+    assert response.items[0].text_edit is None
+    assert response.items[0].additional_text_edits is None
+    assert response.items[0].commit_characters is None
+    assert response.items[0].command is None
+    assert response.items[0].data is None

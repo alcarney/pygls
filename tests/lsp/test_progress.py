@@ -42,20 +42,19 @@ class ConfiguredLS(ClientServer):
 
         @self.server.feature(
             TEXT_DOCUMENT_CODE_LENS,
-            CodeLensOptions(resolve_provider=False,
-                            work_done_progress=True),
+            CodeLensOptions(resolve_provider=False, work_done_progress=True),
         )
         def f1(params: CodeLensParams) -> Optional[List[CodeLens]]:
             self.server.lsp.progress.begin(
-                PROGRESS_TOKEN, WorkDoneProgressBegin(
-                    kind='begin', title="starting", percentage=0)
+                PROGRESS_TOKEN,
+                WorkDoneProgressBegin(kind="begin", title="starting", percentage=0),
             )
             self.server.lsp.progress.report(
                 PROGRESS_TOKEN,
-                WorkDoneProgressReport(kind='report', message="doing", percentage=50),
+                WorkDoneProgressReport(kind="report", message="doing", percentage=50),
             )
             self.server.lsp.progress.end(
-                PROGRESS_TOKEN, WorkDoneProgressEnd(kind='end', message="done")
+                PROGRESS_TOKEN, WorkDoneProgressEnd(kind="end", message="done")
             )
             return None
 
@@ -99,5 +98,4 @@ def test_progress_notifications(client_server):
         "message": "doing",
         "percentage": 50,
     }
-    assert client.notifications[2].value == {
-        "kind": "end", "message": "done"}
+    assert client.notifications[2].value == {"kind": "end", "message": "done"}

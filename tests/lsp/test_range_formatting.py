@@ -39,9 +39,7 @@ class ConfiguredLS(ClientServer):
             TEXT_DOCUMENT_RANGE_FORMATTING,
             DocumentRangeFormattingOptions(),
         )
-        def f(
-            params: DocumentRangeFormattingParams
-        ) -> Optional[List[TextEdit]]:
+        def f(params: DocumentRangeFormattingParams) -> Optional[List[TextEdit]]:
             if params.text_document.uri == "file://return.list":
                 return [
                     TextEdit(
@@ -87,11 +85,11 @@ def test_range_formatting_return_list(client_server):
 
     assert response
 
-    assert response[0]["newText"] == "text"
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
+    assert response[0].new_text == "text"
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
 
 
 @ConfiguredLS.decorate()

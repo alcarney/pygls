@@ -36,7 +36,7 @@ class ConfiguredLS(ClientServer):
 
         @self.server.feature(TEXT_DOCUMENT_PREPARE_RENAME)
         def f(
-            params: PrepareRenameParams
+            params: PrepareRenameParams,
         ) -> Optional[Union[Range, PrepareRenameResult]]:
             return {  # type: ignore
                 "file://return.range": Range(
@@ -64,18 +64,17 @@ def test_prepare_rename_return_range(client_server):
     response = client.lsp.send_request(
         TEXT_DOCUMENT_PREPARE_RENAME,
         PrepareRenameParams(
-            text_document=TextDocumentIdentifier(
-                uri="file://return.range"),
+            text_document=TextDocumentIdentifier(uri="file://return.range"),
             position=Position(line=0, character=0),
         ),
     ).result()
 
     assert response
 
-    assert response["start"]["line"] == 0
-    assert response["start"]["character"] == 0
-    assert response["end"]["line"] == 1
-    assert response["end"]["character"] == 1
+    assert response.start.line == 0
+    assert response.start.character == 0
+    assert response.end.line == 1
+    assert response.end.character == 1
 
 
 @ConfiguredLS.decorate()
@@ -84,20 +83,18 @@ def test_prepare_rename_return_prepare_rename(client_server):
     response = client.lsp.send_request(
         TEXT_DOCUMENT_PREPARE_RENAME,
         PrepareRenameParams(
-            text_document=TextDocumentIdentifier(
-                uri="file://return.prepare_rename"
-            ),
+            text_document=TextDocumentIdentifier(uri="file://return.prepare_rename"),
             position=Position(line=0, character=0),
         ),
     ).result()
 
     assert response
 
-    assert response["range"]["start"]["line"] == 0
-    assert response["range"]["start"]["character"] == 0
-    assert response["range"]["end"]["line"] == 1
-    assert response["range"]["end"]["character"] == 1
-    assert response["placeholder"] == "placeholder"
+    assert response.range.start.line == 0
+    assert response.range.start.character == 0
+    assert response.range.end.line == 1
+    assert response.range.end.character == 1
+    assert response.placeholder == "placeholder"
 
 
 @ConfiguredLS.decorate()

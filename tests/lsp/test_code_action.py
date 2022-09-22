@@ -39,19 +39,14 @@ class ConfiguredLS(ClientServer):
 
         @self.server.feature(
             TEXT_DOCUMENT_CODE_ACTION,
-            CodeActionOptions(code_action_kinds=[CodeActionKind.Refactor])
+            CodeActionOptions(code_action_kinds=[CodeActionKind.Refactor]),
         )
-        def f(
-            params: CodeActionParams
-        ) -> Optional[List[Union[Command, CodeAction]]]:
+        def f(params: CodeActionParams) -> Optional[List[Union[Command, CodeAction]]]:
             if params.text_document.uri == "file://return.list":
                 return [
                     CodeAction(title="action1"),
                     CodeAction(title="action2", kind=CodeActionKind.Refactor),
-                    Command(
-                        title="cmd1", command="cmd1",
-                        arguments=[1, "two"]
-                    ),
+                    Command(title="cmd1", command="cmd1", arguments=[1, "two"]),
                 ]
             else:
                 return None
@@ -94,12 +89,12 @@ def test_code_action_return_list(client_server):
         ),
     ).result()
 
-    assert response[0]["title"] == "action1"
-    assert response[1]["title"] == "action2"
-    assert response[1]["kind"] == CodeActionKind.Refactor.value
-    assert response[2]["title"] == "cmd1"
-    assert response[2]["command"] == "cmd1"
-    assert response[2]["arguments"] == [1, "two"]
+    assert response[0].title == "action1"
+    assert response[1].title == "action2"
+    assert response[1].kind == CodeActionKind.Refactor
+    assert response[2].title == "cmd1"
+    assert response[2].command == "cmd1"
+    assert response[2].arguments == [1, "two"]
 
 
 @ConfiguredLS.decorate()

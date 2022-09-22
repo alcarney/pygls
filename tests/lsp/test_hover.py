@@ -67,8 +67,7 @@ class ConfiguredLS(ClientServer):
                 ),
                 "file://return.markup_content": Hover(
                     range=range,
-                    contents=MarkupContent(
-                        kind=MarkupKind.Markdown, value="value"),
+                    contents=MarkupContent(kind=MarkupKind.Markdown, value="value"),
                 ),
             }.get(params.text_document.uri, None)
 
@@ -87,21 +86,20 @@ def test_hover_return_marked_string(client_server):
     response = client.lsp.send_request(
         TEXT_DOCUMENT_HOVER,
         HoverParams(
-            text_document=TextDocumentIdentifier(
-                uri="file://return.marked_string"),
+            text_document=TextDocumentIdentifier(uri="file://return.marked_string"),
             position=Position(line=0, character=0),
         ),
     ).result()
 
     assert response
 
-    assert response["contents"]["language"] == "language"
-    assert response["contents"]["value"] == "value"
+    assert response.contents.language == "language"
+    assert response.contents.value == "value"
 
-    assert response["range"]["start"]["line"] == 0
-    assert response["range"]["start"]["character"] == 0
-    assert response["range"]["end"]["line"] == 1
-    assert response["range"]["end"]["character"] == 1
+    assert response.range.start.line == 0
+    assert response.range.start.character == 0
+    assert response.range.end.line == 1
+    assert response.range.end.character == 1
 
 
 @ConfiguredLS.decorate()
@@ -119,14 +117,14 @@ def test_hover_return_marked_string_list(client_server):
 
     assert response
 
-    assert response["contents"][0]["language"] == "language"
-    assert response["contents"][0]["value"] == "value"
-    assert response["contents"][1] == "str type"
+    assert response.contents[0].language == "language"
+    assert response.contents[0].value == "value"
+    assert response.contents[1] == "str type"
 
-    assert response["range"]["start"]["line"] == 0
-    assert response["range"]["start"]["character"] == 0
-    assert response["range"]["end"]["line"] == 1
-    assert response["range"]["end"]["character"] == 1
+    assert response.range.start.line == 0
+    assert response.range.start.character == 0
+    assert response.range.end.line == 1
+    assert response.range.end.character == 1
 
 
 @ConfiguredLS.decorate()
@@ -135,19 +133,17 @@ def test_hover_return_markup_content(client_server):
     response = client.lsp.send_request(
         TEXT_DOCUMENT_HOVER,
         HoverParams(
-            text_document=TextDocumentIdentifier(
-                uri="file://return.markup_content"
-            ),
+            text_document=TextDocumentIdentifier(uri="file://return.markup_content"),
             position=Position(line=0, character=0),
         ),
     ).result()
 
     assert response
 
-    assert response["contents"]["kind"] == MarkupKind.Markdown.value
-    assert response["contents"]["value"] == "value"
+    assert response.contents.kind == MarkupKind.Markdown
+    assert response.contents.value == "value"
 
-    assert response["range"]["start"]["line"] == 0
-    assert response["range"]["start"]["character"] == 0
-    assert response["range"]["end"]["line"] == 1
-    assert response["range"]["end"]["character"] == 1
+    assert response.range.start.line == 0
+    assert response.range.start.character == 0
+    assert response.range.end.line == 1
+    assert response.range.end.character == 1

@@ -76,13 +76,13 @@ def test_document_link_return_list(client_server):
 
     assert response
 
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
-    assert response[0]["target"] == "target"
-    assert response[0]["tooltip"] == "tooltip"
-    assert response[0]["data"] == "data"
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
+    assert response[0].target == "target"
+    assert response[0].tooltip == "tooltip"
+    assert response[0].data == "data"
 
 
 @ConfiguredLS.decorate()

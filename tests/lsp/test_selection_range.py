@@ -82,17 +82,17 @@ def test_selection_range_return_list(client_server):
     assert response
 
     root = response[0]
-    assert root["range"]["start"]["line"] == 0
-    assert root["range"]["start"]["character"] == 0
-    assert root["range"]["end"]["line"] == 10
-    assert root["range"]["end"]["character"] == 10
-    assert "parent" not in root
+    assert root.range.start.line == 0
+    assert root.range.start.character == 0
+    assert root.range.end.line == 10
+    assert root.range.end.character == 10
+    assert root.parent is None
 
-    assert response[1]["range"]["start"]["line"] == 0
-    assert response[1]["range"]["start"]["character"] == 0
-    assert response[1]["range"]["end"]["line"] == 1
-    assert response[1]["range"]["end"]["character"] == 1
-    assert response[1]["parent"] == root
+    assert response[1].range.start.line == 0
+    assert response[1].range.start.character == 0
+    assert response[1].range.end.line == 1
+    assert response[1].range.end.character == 1
+    assert response[1].parent == root
 
 
 @ConfiguredLS.decorate()

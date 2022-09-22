@@ -81,11 +81,11 @@ def test_document_formatting_return_list(client_server):
 
     assert response
 
-    assert response[0]["newText"] == "text"
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
+    assert response[0].new_text == "text"
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
 
 
 @ConfiguredLS.decorate()

@@ -74,10 +74,10 @@ def test_moniker_return_list(client_server):
 
     assert response
 
-    assert response[0]["scheme"] == "test_scheme"
-    assert response[0]["identifier"] == "test_identifier"
-    assert response[0]["unique"] == "global"
-    assert response[0]["kind"] == "local"
+    assert response[0].scheme == "test_scheme"
+    assert response[0].identifier == "test_identifier"
+    assert response[0].unique == UniquenessLevel.Global
+    assert response[0].kind == MonikerKind.Local
 
 
 @ConfiguredLS.decorate()

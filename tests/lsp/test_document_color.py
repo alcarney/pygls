@@ -70,12 +70,12 @@ def test_document_color(client_server):
     ).result()
 
     assert response
-    assert response[0]["color"]["red"] == 0.5
-    assert response[0]["color"]["green"] == 0.5
-    assert response[0]["color"]["blue"] == 0.5
-    assert response[0]["color"]["alpha"] == 0.5
+    assert response[0].color.red == 0.5
+    assert response[0].color.green == 0.5
+    assert response[0].color.blue == 0.5
+    assert response[0].color.alpha == 0.5
 
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1

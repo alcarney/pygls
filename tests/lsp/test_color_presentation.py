@@ -92,22 +92,21 @@ def test_color_presentation(client_server):
         ),
     ).result()
 
-    assert response[0]["label"] == "label1"
-    assert response[0]["textEdit"]["newText"] == "te"
+    assert response[0].label == "label1"
+    assert response[0].text_edit.new_text == "te"
+    assert response[0].text_edit.range.start.line == 0
+    assert response[0].text_edit.range.start.character == 0
+    assert response[0].text_edit.range.end.line == 1
+    assert response[0].text_edit.range.end.character == 1
 
-    assert response[0]["textEdit"]["range"]["start"]["line"] == 0
-    assert response[0]["textEdit"]["range"]["start"]["character"] == 0
-    assert response[0]["textEdit"]["range"]["end"]["line"] == 1
-    assert response[0]["textEdit"]["range"]["end"]["character"] == 1
+    range = response[0].additional_text_edits[0].range
+    assert range.start.line == 1
+    assert range.start.character == 1
+    assert range.end.line == 2
+    assert range.end.character == 2
 
-    range = response[0]["additionalTextEdits"][0]["range"]
-    assert range["start"]["line"] == 1
-    assert range["start"]["character"] == 1
-    assert range["end"]["line"] == 2
-    assert range["end"]["character"] == 2
-
-    range = response[0]["additionalTextEdits"][1]["range"]
-    assert range["start"]["line"] == 2
-    assert range["start"]["character"] == 2
-    assert range["end"]["line"] == 3
-    assert range["end"]["character"] == 3
+    range = response[0].additional_text_edits[1].range
+    assert range.start.line == 2
+    assert range.start.character == 2
+    assert range.end.line == 3
+    assert range.end.character == 3

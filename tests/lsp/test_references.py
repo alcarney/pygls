@@ -78,12 +78,12 @@ def test_references_return_list(client_server):
 
     assert response
 
-    assert response[0]["uri"] == "uri"
+    assert response[0].uri == "uri"
 
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
 
 
 @ConfiguredLS.decorate()

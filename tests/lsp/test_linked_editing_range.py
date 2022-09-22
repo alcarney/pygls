@@ -38,9 +38,7 @@ class ConfiguredLS(ClientServer):
             TEXT_DOCUMENT_LINKED_EDITING_RANGE,
             LinkedEditingRangeOptions(),
         )
-        def f(
-            params: LinkedEditingRangeParams
-        ) -> Optional[LinkedEditingRanges]:
+        def f(params: LinkedEditingRangeParams) -> Optional[LinkedEditingRanges]:
             if params.text_document.uri == "file://return.ranges":
                 return LinkedEditingRanges(
                     ranges=[
@@ -73,23 +71,22 @@ def test_linked_editing_ranges_return_ranges(client_server):
     response = client.lsp.send_request(
         TEXT_DOCUMENT_LINKED_EDITING_RANGE,
         LinkedEditingRangeParams(
-            text_document=TextDocumentIdentifier(
-                uri="file://return.ranges"),
+            text_document=TextDocumentIdentifier(uri="file://return.ranges"),
             position=Position(line=0, character=0),
         ),
     ).result()
 
     assert response
 
-    assert response["ranges"][0]["start"]["line"] == 0
-    assert response["ranges"][0]["start"]["character"] == 0
-    assert response["ranges"][0]["end"]["line"] == 1
-    assert response["ranges"][0]["end"]["character"] == 1
-    assert response["ranges"][1]["start"]["line"] == 1
-    assert response["ranges"][1]["start"]["character"] == 1
-    assert response["ranges"][1]["end"]["line"] == 2
-    assert response["ranges"][1]["end"]["character"] == 2
-    assert response["wordPattern"] == "pattern"
+    assert response.ranges[0].start.line == 0
+    assert response.ranges[0].start.character == 0
+    assert response.ranges[0].end.line == 1
+    assert response.ranges[0].end.character == 1
+    assert response.ranges[1].start.line == 1
+    assert response.ranges[1].start.character == 1
+    assert response.ranges[1].end.line == 2
+    assert response.ranges[1].end.character == 2
+    assert response.word_pattern == "pattern"
 
 
 @ConfiguredLS.decorate()

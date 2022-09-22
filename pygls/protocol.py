@@ -33,17 +33,16 @@ from typing import Callable, List, Optional
 
 from pygls.capabilities import ServerCapabilitiesBuilder
 from pygls.constants import ATTR_FEATURE_TYPE
-from pygls.exceptions import (JsonRpcException, JsonRpcInternalError, JsonRpcInvalidParams,
+from pygls.exceptions import (JsonRpcException, JsonRpcInternalError, JsonRpcInvalidParams, JsonRpcInvalidRequest,
                               JsonRpcMethodNotFound, JsonRpcRequestCancelled,
                               MethodTypeNotRegisteredError)
 from pygls.feature_manager import (FeatureManager, assign_help_attrs, get_help_attrs,
                                    is_thread_function)
 from pygls.lsp import (ConfigCallbackType, ShowDocumentCallbackType,
-                       JsonRPCNotification, JsonRPCRequestMessage, JsonRPCResponseMessage,
                        get_method_params_type, get_method_return_type)
 from lsprotocol.types import (CANCEL_REQUEST, CLIENT_REGISTER_CAPABILITY,
                                CLIENT_UNREGISTER_CAPABILITY, EXIT, INITIALIZE, INITIALIZED,
-                               LOG_TRACE, SET_TRACE, SHUTDOWN,
+                               LOG_TRACE, METHOD_TO_TYPES, SET_TRACE, SHUTDOWN,
                                TEXT_DOCUMENT_DID_CHANGE, TEXT_DOCUMENT_DID_CLOSE,
                                TEXT_DOCUMENT_DID_OPEN, TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS,
                                WINDOW_LOG_MESSAGE, WINDOW_SHOW_DOCUMENT, WINDOW_SHOW_MESSAGE,
@@ -154,7 +153,7 @@ def deserialize_params(data, get_params_type):
     return data
 
 
-def deserialize_message(data, get_params_type=get_method_params_type):
+def deserialize_message(data, get_response_type, get_params_type=get_method_params_type):
     """Function used to deserialize data received from client."""
     if 'jsonrpc' in data:
         try:
@@ -164,13 +163,13 @@ def deserialize_message(data, get_params_type=get_method_params_type):
 
         if 'id' in data:
             if 'method' in data:
-                return JsonRPCRequestMessage(**data)
+                return METHOD_TO_TYPES[data['method']][0](**data)
             elif 'error' in data:
                 return converter.structure(data, ResponseErrorMessage)
             else:
-                return JsonRPCResponseMessage(**data)
+                return converter.structure(data, get_response_type(data['id']))
         else:
-            return JsonRPCNotification(**data)
+            return METHOD_TO_TYPES[data['method']][0](**data)
 
     return data
 
@@ -202,6 +201,8 @@ class JsonRPCProtocol(asyncio.Protocol):
 
         self._client_request_futures = {}
         self._server_request_futures = {}
+        self._client_response_types = {}
+        self._server_response_types = {}
 
         self.fm = FeatureManager(server)
         self.transport = None
@@ -252,6 +253,7 @@ class JsonRPCProtocol(asyncio.Protocol):
         if asyncio.iscoroutinefunction(handler):
             future = asyncio.ensure_future(handler(params))
             self._client_request_futures[msg_id] = future
+            self._client_response_types[msg_id] = METHOD_TO_TYPES[method_name][1]
             future.add_done_callback(partial(self._execute_request_callback,
                                              method_name, method_type, msg_id))
         else:
@@ -280,6 +282,7 @@ class JsonRPCProtocol(asyncio.Protocol):
                     error=JsonRpcRequestCancelled(f'Request with id "{msg_id}" is canceled')
                 )
             self._client_request_futures.pop(msg_id, None)
+            self._client_response_types.pop(msg_id, None)
         except Exception:
             error = JsonRpcInternalError.of(sys.exc_info()).to_dict()
             logger.exception('Exception occurred for message "%s": %s', msg_id, error)
@@ -304,6 +307,7 @@ class JsonRPCProtocol(asyncio.Protocol):
 
     def _handle_cancel_notification(self, msg_id):
         """Handles a cancel notification from the client."""
+        self._client_response_types.pop(msg_id, None)
         future = self._client_request_futures.pop(msg_id, None)
 
         if not future:
@@ -337,6 +341,7 @@ class JsonRPCProtocol(asyncio.Protocol):
             if method_name == WORKSPACE_EXECUTE_COMMAND:
                 handler(params, msg_id)
             else:
+                self._client_response_types
                 self._execute_request(msg_id, handler, params)
 
         except JsonRpcException as e:
@@ -349,6 +354,7 @@ class JsonRPCProtocol(asyncio.Protocol):
 
     def _handle_response(self, msg_id, result=None, error=None):
         """Handles a response from the client."""
+        self._server_response_types.pop(msg_id)
         future = self._server_request_futures.pop(msg_id, None)
 
         if not future:
@@ -372,18 +378,20 @@ class JsonRPCProtocol(asyncio.Protocol):
             logger.warning('Server shutting down. No more requests!')
             return
 
-        if isinstance(message, JsonRPCNotification):
-            logger.debug('Notification message received.')
-            self._handle_notification(message.method, message.params)
-        elif isinstance(message, JsonRPCResponseMessage):
-            logger.debug('Response message received.')
-            self._handle_response(message.id, message.result)
-        elif isinstance(message, ResponseErrorMessage):
-            logger.debug('Response message received.')
-            self._handle_response(message.id, None, message.error)
-        elif isinstance(message, JsonRPCRequestMessage):
-            logger.debug('Request message received.')
-            self._handle_request(message.id, message.method, message.params)
+        if hasattr(message, 'method'):
+            if hasattr(message, 'id'):
+                logger.debug('Request message received.')
+                self._handle_request(message.id, message.method, message.params)
+            else:
+                logger.debug('Notification message received.')
+                self._handle_notification(message.method, message.params)
+        else:
+            if hasattr(message, 'error'):
+                logger.debug('Response message received.')
+                self._handle_response(message.id, None, message.error)
+            else:
+                logger.debug('Response message received.')
+                self._handle_response(message.id, message.result)
 
     def _send_data(self, data):
         """Sends data to the client."""
@@ -420,13 +428,26 @@ class JsonRPCProtocol(asyncio.Protocol):
             response = ResponseErrorMessage(id=msg_id, error=error)
 
         else:
-            response = JsonRPCResponseMessage(
+            response_type = self._get_response_type(msg_id)
+            response = response_type(
                 id=msg_id,
                 jsonrpc=JsonRPCProtocol.VERSION,
                 result=result
             )
 
         self._send_data(response)
+
+    def _get_response_type(self, msg_id):
+        """Returns the type of the response for a given message id."""
+        try:
+            return self._server_response_types[msg_id]
+        except KeyError:
+            pass
+
+        try:
+            return self._client_response_types.get(msg_id)
+        except KeyError:
+            raise JsonRpcInvalidRequest.of(msg_id)
 
     def connection_lost(self, exc):
         """Method from base class, called when connection is lost, in which case we
@@ -464,16 +485,18 @@ class JsonRPCProtocol(asyncio.Protocol):
             body, data = body[:length], body[length:]
             self._message_buf = []
 
+            def _deserialize_message(data):
+                return deserialize_message(data, self._get_response_type)
             # Parse the body
             self._procedure_handler(
                 json.loads(body.decode(self.CHARSET),
-                           object_hook=deserialize_message))
+                           object_hook=_deserialize_message))
 
     def notify(self, method: str, params=None):
         """Sends a JSON RPC notification to the client."""
         logger.debug('Sending notification: "%s" %s', method, params)
 
-        request = JsonRPCNotification(
+        request = METHOD_TO_TYPES[method][0](
             jsonrpc=JsonRPCProtocol.VERSION,
             method=method,
             params=params
@@ -494,7 +517,7 @@ class JsonRPCProtocol(asyncio.Protocol):
         msg_id = str(uuid.uuid4())
         logger.debug('Sending request with id "%s": %s %s', msg_id, method, params)
 
-        request = JsonRPCRequestMessage(
+        request = METHOD_TO_TYPES[method][0](
             id=msg_id,
             jsonrpc=JsonRPCProtocol.VERSION,
             method=method,
@@ -511,6 +534,7 @@ class JsonRPCProtocol(asyncio.Protocol):
             future.add_done_callback(wrapper)
 
         self._server_request_futures[msg_id] = future
+        self._server_response_types[msg_id] = METHOD_TO_TYPES[method][1]
         self._send_data(request)
 
         return future

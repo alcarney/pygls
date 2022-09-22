@@ -86,9 +86,7 @@ def test_signature_help_return_signature_help(client_server):
     response = client.lsp.send_request(
         TEXT_DOCUMENT_SIGNATURE_HELP,
         SignatureHelpParams(
-            text_document=TextDocumentIdentifier(
-                uri="file://return.signature_help"
-            ),
+            text_document=TextDocumentIdentifier(uri="file://return.signature_help"),
             position=Position(line=0, character=0),
             context=SignatureHelpContext(
                 trigger_kind=SignatureHelpTriggerKind.TriggerCharacter,
@@ -116,16 +114,13 @@ def test_signature_help_return_signature_help(client_server):
 
     assert response
 
-    assert response["activeParameter"] == 0
-    assert response["activeSignature"] == 0
+    assert response.active_parameter == 0
+    assert response.active_signature == 0
 
-    assert response["signatures"][0]["label"] == "label"
-    assert response["signatures"][0]["documentation"] == "documentation"
-    assert response["signatures"][0]["parameters"][0]["label"] == [0, 0]
-    assert (
-        response["signatures"][0]["parameters"][0]["documentation"]
-        == "documentation"
-    )
+    assert response.signatures[0].label == "label"
+    assert response.signatures[0].documentation == "documentation"
+    assert response.signatures[0].parameters[0].label == [0, 0]
+    assert response.signatures[0].parameters[0].documentation == "documentation"
 
 
 @ConfiguredLS.decorate()

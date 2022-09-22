@@ -72,11 +72,11 @@ def test_folding_range_return_list(client_server):
 
     assert response
 
-    assert response[0]["startLine"] == 0
-    assert response[0]["endLine"] == 0
-    assert response[0]["startCharacter"] == 1
-    assert response[0]["endCharacter"] == 1
-    assert response[0]["kind"] == FoldingRangeKind.Comment.value
+    assert response[0].start_line == 0
+    assert response[0].end_line == 0
+    assert response[0].start_character == 1
+    assert response[0].end_character == 1
+    assert response[0].kind == FoldingRangeKind.Comment
 
 
 @ConfiguredLS.decorate()

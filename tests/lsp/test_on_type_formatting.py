@@ -42,9 +42,7 @@ class ConfiguredLS(ClientServer):
                 more_trigger_character=[",", "."],
             ),
         )
-        def f(
-            params: DocumentOnTypeFormattingParams
-        ) -> Optional[List[TextEdit]]:
+        def f(params: DocumentOnTypeFormattingParams) -> Optional[List[TextEdit]]:
             if params.text_document.uri == "file://return.list":
                 return [
                     TextEdit(
@@ -66,17 +64,12 @@ def test_capabilities(client_server):
 
     assert capabilities.document_on_type_formatting_provider
     assert (
-        capabilities
-        .document_on_type_formatting_provider
-        .first_trigger_character
-        == ":"
+        capabilities.document_on_type_formatting_provider.first_trigger_character == ":"
     )
-    assert (
-        capabilities
-        .document_on_type_formatting_provider
-        .more_trigger_character
-        == [",", "."]
-    )
+    assert capabilities.document_on_type_formatting_provider.more_trigger_character == [
+        ",",
+        ".",
+    ]
 
 
 @ConfiguredLS.decorate()
@@ -100,11 +93,11 @@ def test_on_type_formatting_return_list(client_server):
 
     assert response
 
-    assert response[0]["newText"] == "text"
-    assert response[0]["range"]["start"]["line"] == 0
-    assert response[0]["range"]["start"]["character"] == 0
-    assert response[0]["range"]["end"]["line"] == 1
-    assert response[0]["range"]["end"]["character"] == 1
+    assert response[0].new_text == "text"
+    assert response[0].range.start.line == 0
+    assert response[0].range.start.character == 0
+    assert response[0].range.end.line == 1
+    assert response[0].range.end.character == 1
 
 
 @ConfiguredLS.decorate()

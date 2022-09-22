@@ -43,7 +43,7 @@ if IS_PYODIDE:
 
 @pytest.fixture(autouse=True)
 def client_server(request):
-    if hasattr(request, 'param'):
+    if hasattr(request, "param"):
         ConfiguredClientServer = request.param
         client_server = ConfiguredClientServer()
     else:

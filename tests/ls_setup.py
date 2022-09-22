@@ -25,7 +25,7 @@ from lsprotocol.types import (
     INITIALIZE,
     SHUTDOWN,
     ClientCapabilities,
-    InitializeParams
+    InitializeParams,
 )
 from pygls.protocol import deserialize_message
 
@@ -37,6 +37,7 @@ from ._init_server_stall_fix_hack import retry_stalled_init_fix_hack
 
 
 CALL_TIMEOUT = 3
+
 
 def setup_ls_features(server):
 
@@ -93,23 +94,17 @@ class PyodideClientServer:
 
     @classmethod
     def decorate(cls):
-        return pytest.mark.parametrize(
-            'client_server',
-            [cls],
-            indirect=True
-        )
+        return pytest.mark.parametrize("client_server", [cls], indirect=True)
 
     def initialize(self):
         response = self.client.lsp.send_request(
             INITIALIZE,
             InitializeParams(
-                process_id=12345,
-                root_uri="file://",
-                capabilities=ClientCapabilities()
-            )
+                process_id=12345, root_uri="file://", capabilities=ClientCapabilities()
+            ),
         ).result(timeout=CALL_TIMEOUT)
 
-        assert 'capabilities' in response
+        assert "capabilities" in response
 
     def __iter__(self):
         yield self.client
@@ -141,11 +136,7 @@ class NativeClientServer:
 
     @classmethod
     def decorate(cls):
-        return pytest.mark.parametrize(
-            'client_server',
-            [cls],
-            indirect=True
-        )
+        return pytest.mark.parametrize("client_server", [cls], indirect=True)
 
     def start(self):
         self.server_thread.start()
@@ -154,9 +145,7 @@ class NativeClientServer:
         self.initialize()
 
     def stop(self):
-        shutdown_response = self.client.lsp.send_request(
-            SHUTDOWN
-        ).result()
+        shutdown_response = self.client.lsp.send_request(SHUTDOWN).result()
         assert shutdown_response is None
         self.client.lsp.notify(EXIT)
         self.server_thread.join()
@@ -170,16 +159,14 @@ class NativeClientServer:
     @retry_stalled_init_fix_hack()
     def initialize(self):
 
-        timeout = None if 'DISABLE_TIMEOUT' in os.environ else 1
+        timeout = None if "DISABLE_TIMEOUT" in os.environ else 1
         response = self.client.lsp.send_request(
             INITIALIZE,
             InitializeParams(
-                process_id=12345,
-                root_uri="file://",
-                capabilities=ClientCapabilities()
+                process_id=12345, root_uri="file://", capabilities=ClientCapabilities()
             ),
         ).result(timeout=timeout)
-        assert "capabilities" in response
+        assert hasattr(response, "capabilities")
 
     def __iter__(self):
         yield self.client
