@@ -33,7 +33,7 @@ from typing import (
 )
 
 import cattrs
-from pygls import IS_PYODIDE
+from pygls import IS_WASI, IS_WASM
 from pygls.lsp import ConfigCallbackType, ShowDocumentCallbackType
 from pygls.exceptions import (
     FeatureNotificationError,
@@ -60,7 +60,7 @@ from pygls.progress import Progress
 from pygls.protocol import JsonRPCProtocol, LanguageServerProtocol, default_converter
 from pygls.workspace import Workspace
 
-if not IS_PYODIDE:
+if not IS_WASM:
     from multiprocessing.pool import ThreadPool
 
 
@@ -210,7 +210,7 @@ class Server:
         if sync_kind is not None:
             self.text_document_sync_kind = sync_kind
 
-        if loop is None:
+        if loop is None and not IS_WASI:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             self._owns_loop = True
@@ -244,32 +244,84 @@ class Server:
             logger.info("Closing the event loop.")
             self.loop.close()
 
-    def start_io(self, stdin: Optional[TextIO] = None, stdout: Optional[TextIO] = None):
-        """Starts IO server."""
-        logger.info("Starting IO server")
+    if IS_WASI:
 
-        self._stop_event = Event()
-        transport = StdOutTransportAdapter(
-            stdin or sys.stdin.buffer, stdout or sys.stdout.buffer
-        )
-        self.lsp.connection_made(transport)  # type: ignore[arg-type]
+        def start_io(
+            self, stdin: Optional[TextIO] = None, stdout: Optional[TextIO] = None
+        ):
+            CONTENT_LENGTH_PATTERN = re.compile(rb"^Content-Length: (\d+)\r\n$")
 
-        try:
-            self.loop.run_until_complete(
-                aio_readline(
-                    self.loop,
-                    self.thread_pool_executor,
-                    self._stop_event,
-                    stdin or sys.stdin.buffer,
-                    self.lsp.data_received,
-                )
+            # Initialize message buffer
+            message = []
+            content_length = 0
+
+            stdin = stdin or sys.stdin.buffer
+            stdout = stdout or sys.stdout.buffer
+
+            self.lsp.connection_made(StdOutTransportAdapter(stdin, stdout))
+            self._stop_event = Event()
+
+            while not self._stop_event.is_set() and not stdin.closed:
+                # Read a header line
+                header = stdin.readline()
+                if not header:
+                    break
+                message.append(header)
+
+                # Extract content length if possible
+                if not content_length:
+                    match = CONTENT_LENGTH_PATTERN.fullmatch(header)
+                    if match:
+                        content_length = int(match.group(1))
+                        logger.debug("Content length: %s", content_length)
+
+                # Check if all headers have been read (as indicated by an empty line \r\n)
+                if content_length and not header.strip():
+                    # Read body
+                    body = stdin.read(content_length)
+                    if not body:
+                        break
+                    message.append(body)
+
+                    # Pass message to language server protocol
+                    self.lsp.data_received(b"".join(message))
+
+                    # Reset the buffer
+                    message = []
+                    content_length = 0
+
+    else:
+
+        def start_io(
+            self, stdin: Optional[TextIO] = None, stdout: Optional[TextIO] = None
+        ):
+            """Starts IO server."""
+            logger.info("Starting IO server")
+
+            self._stop_event = Event()
+            transport = StdOutTransportAdapter(
+                stdin or sys.stdin.buffer, stdout or sys.stdout.buffer
             )
-        except BrokenPipeError:
-            logger.error("Connection to the client is lost! Shutting down the server.")
-        except (KeyboardInterrupt, SystemExit):
-            pass
-        finally:
-            self.shutdown()
+            self.lsp.connection_made(transport)
+
+            try:
+                self.loop.run_until_complete(
+                    aio_readline(
+                        self.loop,
+                        self.thread_pool_executor,
+                        self._stop_event,
+                        stdin or sys.stdin.buffer,
+                        self.lsp.data_received,
+                    )
+                )
+            except BrokenPipeError:
+                logger.error(
+                    "Connection to the client is lost! Shutting down the server."
+                )
+            except (KeyboardInterrupt, SystemExit):
+                pass
+            finally:
+                self.shutdown()
 
     def start_pyodide(self):
         logger.info("Starting Pyodide server")
@@ -328,7 +380,7 @@ class Server:
             self._stop_event.set()
             self.shutdown()
 
-    if not IS_PYODIDE:
+    if not IS_WASM:
 
         @property
         def thread_pool(self) -> ThreadPool:
