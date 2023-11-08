@@ -30,7 +30,7 @@ async def test_code_actions(
     code_action_options = initialize_result.capabilities.code_action_provider
     assert code_action_options.code_action_kinds == [types.CodeActionKind.QuickFix]
 
-    test_uri = uri_for("sums.txt")
+    test_uri = f"file:///examples/workspace/sums.txt"  # uri_for("sums.txt")
     assert test_uri is not None
 
     response = await client.text_document_code_action_async(

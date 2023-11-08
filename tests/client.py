@@ -159,13 +159,15 @@ def create_client_for_server(server_name: str):
         server_dir = pathlib.Path(__file__, "..", "..", "examples", "servers").resolve()
         root_dir = pathlib.Path(__file__, "..", "..", "examples", "workspace").resolve()
 
-        await client.start_io(sys.executable, str(server_dir / server_name))
-
+        # await client.start_io(sys.executable, str(server_dir / server_name))
+        await client.start_io(
+            "nix", "develop", "-c", "python", f"examples/servers/{server_name}"
+        )
         # Initialize the server
         response = await client.initialize_async(
             types.InitializeParams(
                 capabilities=types.ClientCapabilities(),
-                root_uri=uris.from_fs_path(root_dir),
+                root_uri=uris.from_fs_path("/examples/workspace"),
             )
         )
         assert response is not None
