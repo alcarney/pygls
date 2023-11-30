@@ -19,45 +19,44 @@ import json
 import logging
 import re
 import sys
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import Future
+from concurrent.futures import ThreadPoolExecutor
 from threading import Event
-from typing import (
-    Any,
-    Callable,
-    List,
-    Optional,
-    TextIO,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any
+from typing import Callable
+from typing import List
+from typing import Optional
+from typing import TextIO
+from typing import Type
+from typing import TypeVar
+from typing import Union
 
 import cattrs
+from lsprotocol.types import ClientCapabilities
+from lsprotocol.types import Diagnostic
+from lsprotocol.types import MessageType
+from lsprotocol.types import NotebookDocumentSyncOptions
+from lsprotocol.types import RegistrationParams
+from lsprotocol.types import ServerCapabilities
+from lsprotocol.types import ShowDocumentParams
+from lsprotocol.types import TextDocumentSyncKind
+from lsprotocol.types import UnregistrationParams
+from lsprotocol.types import WorkspaceApplyEditResponse
+from lsprotocol.types import WorkspaceConfigurationParams
+from lsprotocol.types import WorkspaceEdit
+
 from pygls import IS_PYODIDE
-from pygls.lsp import ConfigCallbackType, ShowDocumentCallbackType
-from pygls.exceptions import (
-    FeatureNotificationError,
-    JsonRpcInternalError,
-    PyglsError,
-    JsonRpcException,
-    FeatureRequestError,
-)
-from lsprotocol.types import (
-    ClientCapabilities,
-    Diagnostic,
-    MessageType,
-    NotebookDocumentSyncOptions,
-    RegistrationParams,
-    ServerCapabilities,
-    ShowDocumentParams,
-    TextDocumentSyncKind,
-    UnregistrationParams,
-    WorkspaceApplyEditResponse,
-    WorkspaceEdit,
-    WorkspaceConfigurationParams,
-)
+from pygls.exceptions import FeatureNotificationError
+from pygls.exceptions import FeatureRequestError
+from pygls.exceptions import JsonRpcException
+from pygls.exceptions import JsonRpcInternalError
+from pygls.exceptions import PyglsError
+from pygls.lsp import ConfigCallbackType
+from pygls.lsp import ShowDocumentCallbackType
 from pygls.progress import Progress
-from pygls.protocol import JsonRPCProtocol, LanguageServerProtocol, default_converter
+from pygls.protocol import JsonRPCProtocol
+from pygls.protocol import LanguageServerProtocol
+from pygls.protocol import default_converter
 from pygls.workspace import Workspace
 
 if not IS_PYODIDE:
@@ -67,6 +66,7 @@ if not IS_PYODIDE:
 logger = logging.getLogger(__name__)
 
 F = TypeVar("F", bound=Callable)
+CONTENT_LENGTH_PATTERN = re.compile(rb"^Content-Length: (\d+)\r\n$")
 
 ServerErrors = Union[
     PyglsError,
@@ -79,8 +79,6 @@ ServerErrors = Union[
 
 async def aio_readline(loop, executor, stop_event, rfile, proxy):
     """Reads data from stdin in separate thread (asynchronously)."""
-
-    CONTENT_LENGTH_PATTERN = re.compile(rb"^Content-Length: (\d+)\r\n$")
 
     # Initialize message buffer
     message = []
@@ -249,18 +247,24 @@ class Server:
         logger.info("Starting IO server")
 
         self._stop_event = Event()
-        transport = StdOutTransportAdapter(
-            stdin or sys.stdin.buffer, stdout or sys.stdout.buffer
-        )
+        stdin = stdin or sys.stdin.buffer
+        stdout = stdout or sys.stdout.buffer
+        transport = StdOutTransportAdapter(stdin, stdout)
         self.lsp.connection_made(transport)  # type: ignore[arg-type]
 
+        if IS_PYODIDE:
+            self._start_sync_io(stdin)
+        else:
+            self._start_async_io(stdin)
+
+    def _start_async_io(self, stdin: TextIO):
         try:
             self.loop.run_until_complete(
                 aio_readline(
                     self.loop,
                     self.thread_pool_executor,
                     self._stop_event,
-                    stdin or sys.stdin.buffer,
+                    stdin,
                     self.lsp.data_received,
                 )
             )
@@ -271,14 +275,32 @@ class Server:
         finally:
             self.shutdown()
 
-    def start_pyodide(self):
-        logger.info("Starting Pyodide server")
+    def _start_sync_io(self, stdin: TextIO):
+        message = []
+        content_length = 0
 
-        # Note: We don't actually start anything running as the main event
-        # loop will be handled by the web platform.
-        transport = PyodideTransportAdapter(sys.stdout)
-        self.lsp.connection_made(transport)  # type: ignore[arg-type]
-        self.lsp._send_only_body = True  # Don't send headers within the payload
+        while not self._stop_event.is_set() and not stdin.closed:
+            header = stdin.readline()
+            if not header:
+                break
+            message.append(header)
+
+            if not content_length:
+                match = CONTENT_LENGTH_PATTERN.fullmatch(header)
+                if match:
+                    content_length = int(match.group(1))
+                    logger.debug("Content length: %s", content_length)
+
+            if content_length and not header.strip():
+                body = stdin.read(content_length)
+                if not body:
+                    break
+                message.append(body)
+
+                self.lsp.data_received(b"".join(message))
+
+                message = []
+                content_length = 0
 
     def start_tcp(self, host: str, port: int) -> None:
         """Starts TCP server."""

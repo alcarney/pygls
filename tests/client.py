@@ -145,21 +145,43 @@ def make_test_lsp_client() -> LanguageClient:
     return client
 
 
+async def get_stdio_client_server(server_name: str):
+    """Return a client-server connection for a native Python server running over stdio."""
+
+    client = make_test_lsp_client()
+    server_dir = pathlib.Path(__file__, "..", "..", "examples", "servers").resolve()
+
+    await client.start_io(sys.executable, str(server_dir / server_name))
+    return client
+
+
+async def get_pyodide_client_server(server_name: str):
+    """Return a client-server connection for a pyodide server running over stdio."""
+
+    client = make_test_lsp_client()
+    pyodide_dir = pathlib.Path(__file__).parent / "pyodide"
+    server_dir = pathlib.Path(__file__, "..", "..", "examples", "servers").resolve()
+
+    await client.start_io(
+        "node", str(pyodide_dir / "run_server.js"), str(server_dir / server_name)
+    )
+    return client
+
+
 def create_client_for_server(server_name: str):
     """Automate the process of creating a language client connected to the given server
     and tearing it down again.
     """
 
     @pytest_asyncio.fixture
-    async def fixture_func():
-        if IS_PYODIDE:
-            pytest.skip("not available in pyodide")
-
-        client = make_test_lsp_client()
-        server_dir = pathlib.Path(__file__, "..", "..", "examples", "servers").resolve()
+    async def fixture_func(request):
+        platform = request.config.getoption("platform")
         root_dir = pathlib.Path(__file__, "..", "..", "examples", "workspace").resolve()
 
-        await client.start_io(sys.executable, str(server_dir / server_name))
+        if platform == "pyodide":
+            client = await get_pyodide_client_server(server_name)
+        else:
+            client = await get_stdio_client_server(server_name)
 
         # Initialize the server
         response = await client.initialize_async(

@@ -21,19 +21,19 @@ import pathlib
 import sys
 
 import pytest
-from lsprotocol import types, converters
+from lsprotocol import converters
+from lsprotocol import types
 
-from pygls import uris, IS_PYODIDE, IS_WIN
+from pygls import IS_PYODIDE
+from pygls import IS_WIN
+from pygls import uris
 from pygls.feature_manager import FeatureManager
 from pygls.workspace import Workspace
 
-from .ls_setup import (
-    NativeClientServer,
-    PyodideClientServer,
-    setup_ls_features,
-)
-
 from .client import create_client_for_server
+from .ls_setup import NativeClientServer
+from .ls_setup import PyodideClientServer
+from .ls_setup import setup_ls_features
 
 DOC = """document
 for
@@ -105,6 +105,18 @@ def server_dir():
     """Returns the directory where all the example language servers live"""
     path = pathlib.Path(__file__) / ".." / ".." / "examples" / "servers"
     return path.resolve()
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup("pygls")
+    group.addoption(
+        "--server-platform",
+        dest="platform",
+        choices=("stdio", "pyodide"),
+        action="store",
+        default="stdio",
+        help="the platform to run the server under",
+    )
 
 
 code_action_client = create_client_for_server("code_actions.py")

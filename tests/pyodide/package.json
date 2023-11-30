@@ -1,0 +1,13 @@
+{
+  "name": "pyodide_testrunner",
+  "version": "0.0.0",
+  "description": "Simple wrapper fo pygls servers running under Pyodide",
+  "main": "run_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "dependencies": {
+    "pyodide": "^0.24.1"
+  }
+}
