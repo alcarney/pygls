@@ -162,6 +162,7 @@ class FeatureManager:
         self,
         feature_name: str,
         options: Optional[Any] = None,
+        **kwargs,
     ) -> Callable:
         """Decorator used to register LSP features.
 
@@ -188,21 +189,23 @@ class FeatureManager:
 
             self._features[feature_name] = wrapped
 
-            if options:
+            opts: Dict[str, Any] = {}
+            if options is not None:
                 options_type = get_method_options_type(feature_name)
-                if options_type and not is_instance(
-                    self.converter, options, options_type
-                ):
+                if options_type and not is_instance(self.converter, options, options_type):
                     raise TypeError(
-                        (
-                            f'Options of method "{feature_name}"'
-                            f" is instance of type {type(options)}"
-                            f" which is not a subtype of {options_type}"
-                        )
+                        f"Options of method {feature_name!r} "
+                        f"is instance of type {type(options)} "
+                        f"which is not a subtype of {options_type}"
                     )
-                self._feature_options[feature_name] = options
 
-            logger.info('Registered "%s" with options "%s"', feature_name, options)
+                opts = self.converter.unstructure(options)
+
+            feature_options = {**opts, **kwargs}
+            if len(feature_options) > 0:
+                self._feature_options[feature_name] = feature_options
+
+            logger.info('Registered "%s" with options "%s"', feature_name, feature_options)
 
             return f
 

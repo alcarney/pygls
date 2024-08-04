@@ -104,11 +104,8 @@ def did_change(ls: PullDiagnosticServer, params: types.DidOpenTextDocumentParams
 
 @server.feature(
     types.TEXT_DOCUMENT_DIAGNOSTIC,
-    types.DiagnosticOptions(
-        identifier="pull-diagnostics",
-        inter_file_dependencies=False,
-        workspace_diagnostics=True,
-    ),
+    identifier="pull-diagnostics",
+    inter_file_dependencies=False,
 )
 def document_diagnostic(
     ls: PullDiagnosticServer, params: types.DocumentDiagnosticParams

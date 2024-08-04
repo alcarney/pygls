@@ -18,8 +18,10 @@ from functools import reduce
 from typing import Any, Dict, List, Optional, Set, Union, TypeVar
 import logging
 
+import cattrs
 from lsprotocol import types
 
+from pygls.lsp import get_method_options_type
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -56,6 +58,7 @@ class ServerCapabilitiesBuilder:
 
     def __init__(
         self,
+        converter: cattrs.Converter,
         client_capabilities: types.ClientCapabilities,
         features: Set[str],
         feature_options: Dict[str, Any],
@@ -63,6 +66,7 @@ class ServerCapabilitiesBuilder:
         text_document_sync_kind: types.TextDocumentSyncKind,
         notebook_document_sync: Optional[types.NotebookDocumentSyncOptions] = None,
     ):
+        self.converter = converter
         self.client_capabilities = client_capabilities
         self.features = features
         self.feature_options = feature_options
@@ -72,10 +76,52 @@ class ServerCapabilitiesBuilder:
 
         self.server_cap = types.ServerCapabilities()
 
-    def _provider_options(self, feature: str, default: T) -> Optional[Union[T, Any]]:
-        if feature in self.features:
-            return self.feature_options.get(feature, default)
-        return None
+    def _provider_options(
+        self,
+        feature: str,
+        default: Optional[T] = None,
+        **overrides,
+    ) -> Optional[Union[T, Any]]:
+        """Get the provider options for the given feature name.
+
+        Parameters
+        ----------
+        feature
+           The name of the eature
+
+        default
+           If the user has not provided any options, this is the default value that
+           should be used in their place
+
+        overrides
+           If set, these fields should forcibly override any user provided values.
+           Used to set computed fields like ``resolve_provider``
+
+        Returns
+        -------
+        Optional[Any]
+           The instance of the given method's options, if any
+        """
+        if feature not in self.features:
+            return None
+
+        value = self.feature_options.get(feature, default)
+
+        # Some default values are just `True`
+        if not isinstance(value, dict):
+            return value
+
+        # Apply overrides to the user's value
+        options = {**value, **overrides}
+
+        # Ensure any missing default values are also included
+        if isinstance(default, dict):
+            options = {**default, **options}
+
+        # Finally, the coverter expects keys to be camelCase
+        options = {_to_camel_case(k): v for k, v in options.items()}
+        options_type = get_method_options_type(feature)
+        return self.converter.structure(options, options_type)
 
     def _with_text_document_sync(self):
         open_close = (
@@ -96,7 +142,7 @@ class ServerCapabilitiesBuilder:
             and types.TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL in self.features
         )
         if types.TEXT_DOCUMENT_DID_SAVE in self.features:
-            save = self.feature_options.get(types.TEXT_DOCUMENT_DID_SAVE, True)
+            save = self._provider_options(types.TEXT_DOCUMENT_DID_SAVE, True)
         else:
             save = False
 
@@ -400,12 +446,10 @@ class ServerCapabilitiesBuilder:
     def _with_diagnostic_provider(self):
         value = self._provider_options(
             types.TEXT_DOCUMENT_DIAGNOSTIC,
-            default=types.DiagnosticOptions(
-                inter_file_dependencies=False, workspace_diagnostics=False
-            ),
+            default=dict(inter_file_dependencies=False),
+            workspace_diagnostics=types.WORKSPACE_DIAGNOSTIC in self.features,
         )
         if value is not None:
-            value.workspace_diagnostics = types.WORKSPACE_DIAGNOSTIC in self.features
             self.server_cap.diagnostic_provider = value
         return self
 
@@ -477,3 +521,9 @@ class ServerCapabilitiesBuilder:
             ._with_position_encodings()
             ._build()
         )
+
+
+def _to_camel_case(key: str) -> str:
+    """Convert a key to camel case."""
+    parts = key.split("_")
+    return parts[0] + "".join(p.title() for p in parts[1:])

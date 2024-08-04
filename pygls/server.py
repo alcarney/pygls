@@ -457,6 +457,7 @@ class LanguageServer(Server):
         self,
         feature_name: str,
         options: Optional[Any] = None,
+        **kwargs,
     ) -> Callable[[F], F]:
         """Decorator used to register LSP features.
 
@@ -468,7 +469,7 @@ class LanguageServer(Server):
            def completions(ls, params: CompletionParams):
                return CompletionList(is_incomplete=False, items=[CompletionItem("Completion 1")])
         """
-        return self.lsp.fm.feature(feature_name, options)
+        return self.lsp.fm.feature(feature_name, options, **kwargs)
 
     def get_configuration(
         self,

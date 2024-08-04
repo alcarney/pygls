@@ -18,6 +18,8 @@ import asyncio
 from typing import Any
 
 import pytest
+from lsprotocol import types as lsp
+
 from pygls.capabilities import ServerCapabilitiesBuilder
 from pygls.exceptions import (
     CommandAlreadyRegisteredError,
@@ -29,7 +31,7 @@ from pygls.feature_manager import (
     has_ls_param_or_annotation,
     wrap_with_server,
 )
-from lsprotocol import types as lsp
+from pygls.protocol import default_converter
 
 
 class Temp:
@@ -94,7 +96,7 @@ def test_register_feature_with_valid_options(feature_manager):
     assert lsp.TEXT_DOCUMENT_COMPLETION in reg_feature_options
 
     assert feature_manager.features[lsp.TEXT_DOCUMENT_COMPLETION] is completions
-    assert feature_manager.feature_options[lsp.TEXT_DOCUMENT_COMPLETION] is options
+    assert feature_manager.feature_options[lsp.TEXT_DOCUMENT_COMPLETION] == {"triggerCharacters": ["!"]}
 
 
 def test_register_feature_with_wrong_options(feature_manager):
@@ -698,6 +700,7 @@ def test_register_feature(
         pass
 
     actual = ServerCapabilitiesBuilder(
+        default_converter(),
         capabilities,
         feature_manager.features.keys(),
         feature_manager.feature_options,
@@ -722,6 +725,7 @@ def test_register_prepare_rename_no_client_support(feature_manager: FeatureManag
     expected = server_capabilities(rename_provider=True)
 
     actual = ServerCapabilitiesBuilder(
+        default_converter(),
         lsp.ClientCapabilities(),
         feature_manager.features.keys(),
         feature_manager.feature_options,
@@ -748,6 +752,7 @@ def test_register_prepare_rename_with_client_support(feature_manager: FeatureMan
     )
 
     actual = ServerCapabilitiesBuilder(
+        default_converter(),
         lsp.ClientCapabilities(
             text_document=lsp.TextDocumentClientCapabilities(
                 rename=lsp.RenameClientCapabilities(prepare_support=True)
@@ -777,6 +782,7 @@ def test_register_inlay_hint_resolve(feature_manager: FeatureManager):
     )
 
     actual = ServerCapabilitiesBuilder(
+        default_converter(),
         lsp.ClientCapabilities(),
         feature_manager.features.keys(),
         feature_manager.feature_options,
@@ -802,6 +808,7 @@ def test_register_workspace_symbol_resolve(feature_manager: FeatureManager):
     )
 
     actual = ServerCapabilitiesBuilder(
+        default_converter(),
         lsp.ClientCapabilities(),
         feature_manager.features.keys(),
         feature_manager.feature_options,
@@ -838,6 +845,7 @@ def test_register_workspace_diagnostics(feature_manager: FeatureManager):
     )
 
     actual = ServerCapabilitiesBuilder(
+        default_converter(),
         lsp.ClientCapabilities(),
         feature_manager.features.keys(),
         feature_manager.feature_options,

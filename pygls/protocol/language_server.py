@@ -203,6 +203,7 @@ class LanguageServerProtocol(JsonRPCProtocol, metaclass=LSPMeta):
         # Initialize server capabilities
         self.client_capabilities = params.capabilities
         self.server_capabilities = ServerCapabilitiesBuilder(
+            self._converter,
             self.client_capabilities,
             set({**self.fm.features, **self.fm.builtin_features}.keys()),
             self.fm.feature_options,
