@@ -1,31 +1,27 @@
-[tool.poetry]
+[project]
 name = "pygls"
 version = "2.0.0a4"
 description = "A pythonic generic language server (pronounced like 'pie glass')"
-authors = ["Open Law Library <info@openlawlib.org>"]
+authors = [
+  { name = "Open Law Library", email = "info@openlawlib.org" }
+]
 maintainers = [
-    "Tom BH <tom@tombh.co.uk>",
-    "Alex Carney <alcarneyme@gmail.com>",
+    { name = "Tom BH", email = "tom@tombh.co.uk" },
+    { name = "Alex Carney",  email = "alcarneyme@gmail.com" },
 ]
 repository = "https://github.com/openlawlibrary/pygls"
 documentation = "https://pygls.readthedocs.io/en/latest"
 license = "Apache-2.0"
 readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "attrs >= 24.3.0",
+    "cattrs >= 23.1.2",
+    "lsprotocol == 2025.0.0rc1",
+]
 
-# You may want to use the Poetry "Up" plugin to automatically update all dependencies to
-# their latest major versions. But bear in mind that this is a library, so the non-development
-# dependency versions will be forced on downstream users. Therefore the very latest versions
-# may be too restrictive.
-# See https://github.com/MousaZeidBaker/poetry-plugin-up
-[tool.poetry.dependencies]
-python = ">=3.9"
-attrs = ">=24.3.0"
-cattrs = ">=23.1.2"
-lsprotocol = "2025.0.0rc1"
-websockets = { version = ">=13.0", optional = true }
-
-[tool.poetry.extras]
-ws = ["websockets"]
+[project.optional-dependencies]
+ws = ["websockets >= 13.0"]
 
 [tool.poetry.group.dev.dependencies]
 # Replaces (amongst many other things) flake8 and bandit
