@@ -17,7 +17,6 @@
 # limitations under the License.                                           #
 ############################################################################
 import logging
-from typing import List, Optional, Union
 
 from lsprotocol import types
 
@@ -28,9 +27,9 @@ log = logging.getLogger(__name__)
 class PositionCodec:
     def __init__(
         self,
-        encoding: Optional[
-            Union[types.PositionEncodingKind, str]
-        ] = types.PositionEncodingKind.Utf16,
+        encoding: None | (
+            types.PositionEncodingKind | str
+        ) = types.PositionEncodingKind.Utf16,
     ):
         self.encoding = encoding
 
@@ -64,7 +63,7 @@ class PositionCodec:
         return utf32_units + self.utf16_unit_offset(chars)
 
     def position_from_client_units(
-        self, lines: List[str], position: types.Position
+        self, lines: list[str], position: types.Position
     ) -> types.Position:
         """
         Convert the position.character from UTF-[32|16|8] code units to UTF-32.
@@ -138,7 +137,7 @@ class PositionCodec:
         return position
 
     def position_to_client_units(
-        self, lines: List[str], position: types.Position
+        self, lines: list[str], position: types.Position
     ) -> types.Position:
         """
         Convert the position.character from its internal UTF-32 representation
@@ -165,7 +164,7 @@ class PositionCodec:
             return types.Position(line=len(lines), character=0)
 
     def range_from_client_units(
-        self, lines: List[str], range: types.Range
+        self, lines: list[str], range: types.Range
     ) -> types.Range:
         """
         Convert range.[start|end].character from UTF-[32|16|8] code units to UTF-32.
@@ -186,7 +185,7 @@ class PositionCodec:
         return range_new
 
     def range_to_client_units(
-        self, lines: List[str], range: types.Range
+        self, lines: list[str], range: types.Range
     ) -> types.Range:
         """
         Convert range.[start|end].character from UTF-32 to UTF-[32|16|8] code units.

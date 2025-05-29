@@ -29,7 +29,6 @@ from pygls import IS_WIN
 from pygls.exceptions import JsonRpcInternalError
 
 if typing.TYPE_CHECKING:
-    from typing import Tuple
 
     from pygls.lsp.client import BaseLanguageClient
 
@@ -57,7 +56,7 @@ def record_time(result, *, timedict, key):
 
 @pytest.mark.asyncio(loop_scope="function")
 async def test_countdown_blocking(
-    threaded_handlers: Tuple[BaseLanguageClient, types.InitializeResult], uri_for
+    threaded_handlers: tuple[BaseLanguageClient, types.InitializeResult], uri_for
 ):
     """Ensure that the countdown blocking command is working as expected."""
     client, initialize_result = threaded_handlers
@@ -125,7 +124,7 @@ async def test_countdown_blocking(
 
 @pytest.mark.asyncio(loop_scope="function")
 async def test_countdown_threaded(
-    threaded_handlers: Tuple[BaseLanguageClient, types.InitializeResult],
+    threaded_handlers: tuple[BaseLanguageClient, types.InitializeResult],
     uri_for,
     runtime: str,
     transport: str,
@@ -203,7 +202,7 @@ async def test_countdown_threaded(
 
 @pytest.mark.asyncio(loop_scope="function")
 async def test_countdown_error(
-    threaded_handlers: Tuple[BaseLanguageClient, types.InitializeResult],
+    threaded_handlers: tuple[BaseLanguageClient, types.InitializeResult],
     uri_for,
     runtime: str,
 ):

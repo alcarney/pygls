@@ -20,8 +20,6 @@ from __future__ import annotations
 
 import traceback
 from typing import Any
-from typing import Set
-from typing import Type
 from lsprotocol.types import ResponseError
 
 
@@ -176,7 +174,7 @@ def _is_server_error_code(code):
     return -32099 <= code <= -32000
 
 
-_EXCEPTIONS: Set[Type[JsonRpcException]] = {
+_EXCEPTIONS: set[type[JsonRpcException]] = {
     JsonRpcInternalError,
     JsonRpcInvalidParams,
     JsonRpcInvalidRequest,

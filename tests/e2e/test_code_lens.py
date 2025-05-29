@@ -23,7 +23,6 @@ import pytest_asyncio
 from lsprotocol import types
 
 if typing.TYPE_CHECKING:
-    from typing import Tuple
 
     from pygls.lsp.client import BaseLanguageClient
 
@@ -36,7 +35,7 @@ async def code_lens(get_client_for):
 
 @pytest.mark.asyncio(loop_scope="module")
 async def test_code_lens(
-    code_lens: Tuple[BaseLanguageClient, types.InitializeResult], uri_for
+    code_lens: tuple[BaseLanguageClient, types.InitializeResult], uri_for
 ):
     """Ensure that the example code lens server is working as expected."""
     client, initialize_result = code_lens
@@ -77,7 +76,7 @@ async def test_code_lens(
 
 @pytest.mark.asyncio(loop_scope="module")
 async def test_code_lens_resolve(
-    code_lens: Tuple[BaseLanguageClient, types.InitializeResult], uri_for
+    code_lens: tuple[BaseLanguageClient, types.InitializeResult], uri_for
 ):
     """Ensure that the example code lens server can resolve a code lens correctly."""
 
@@ -110,7 +109,7 @@ async def test_code_lens_resolve(
 
 @pytest.mark.asyncio(loop_scope="module")
 async def test_evaluate_sum(
-    code_lens: Tuple[BaseLanguageClient, types.InitializeResult], uri_for
+    code_lens: tuple[BaseLanguageClient, types.InitializeResult], uri_for
 ):
     """Ensure that the example code lens server can execute the ``evaluateSum`` command
     correctly."""

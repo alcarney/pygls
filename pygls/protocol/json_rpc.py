@@ -28,7 +28,8 @@ import typing
 import uuid
 from concurrent.futures import Future
 from functools import partial
-from typing import Any, Callable, Protocol, Type, Union, runtime_checkable
+from typing import Any, Protocol, Union, runtime_checkable
+from collections.abc import Callable
 
 import attrs
 from cattrs.errors import ClassValidationError
@@ -550,7 +551,7 @@ class JsonRPCProtocol:
         self,
         msg_id: MsgId,
         result: Any | None = None,
-        error: Union[ResponseError, None] = None,
+        error: ResponseError | None = None,
     ):
         """Send a JSON-RPC response
 
@@ -601,11 +602,11 @@ class JsonRPCProtocol:
         self.writer = writer
         self._include_headers = include_headers
 
-    def get_message_type(self, method: str) -> Type[Any] | None:
+    def get_message_type(self, method: str) -> type[Any] | None:
         """Return the type definition of the message associated with the given method."""
         return None
 
-    def get_result_type(self, method: str) -> Type[Any] | None:
+    def get_result_type(self, method: str) -> type[Any] | None:
         """Return the type definition of the result associated with the given method."""
         return None
 

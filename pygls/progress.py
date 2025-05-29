@@ -1,6 +1,5 @@
 import asyncio
 from concurrent.futures import Future
-from typing import Dict
 
 from lsprotocol.types import (
     PROGRESS,
@@ -28,7 +27,7 @@ class Progress:
     def __init__(self, lsp: LanguageServerProtocol) -> None:
         self._lsp = lsp
 
-        self.tokens: Dict[ProgressToken, Future] = {}
+        self.tokens: dict[ProgressToken, Future] = {}
 
     def _check_token_registered(self, token: ProgressToken) -> None:
         if token in self.tokens:
