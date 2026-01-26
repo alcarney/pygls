@@ -2,6 +2,33 @@
 All notable changes to this project will be documented in this file.
 
 
+## [2.0.1] - 2026-01-26
+More details: https://github.com/openlawlibrary/pygls/releases/tag/v2.0.1
+
+### Bug Fixes
+
+- Prevent exception handling for cancelled futures in JsonRPCProtocol
+
+### Documentation
+
+- Drop pre-release banner
+- Use correct lsprotocol version
+- Fix broken link for pygls playground
+- Describe arguments unpacking for server commands in v2
+- Add Aeon Programming Language to implementations list
+- V2 migration spelling mistakes
+
+### Miscellaneous Tasks
+
+- Update CHANGELOG.md
+- Update CONTRIBUTORS.md
+
+### Build
+
+- V2.0.1
+
+
+
 ## [2.0.0] - 2025-10-17
 More details: https://github.com/openlawlibrary/pygls/releases/tag/v2.0.0
 
