@@ -5,6 +5,7 @@ import typing
 from lsprotocol import types
 
 from pygls.exceptions import FeatureRequestError
+from pygls.workspace import Workspace
 
 from ._base_server import BaseLanguageServer
 
@@ -66,6 +67,7 @@ class LanguageServer(BaseLanguageServer):
         version: str,
         text_document_sync_kind: types.TextDocumentSyncKind = types.TextDocumentSyncKind.Incremental,
         notebook_document_sync: types.NotebookDocumentSyncOptions | None = None,
+        workspace_cls: type[Workspace] = Workspace,
         *args,
         **kwargs,
     ):
@@ -73,6 +75,7 @@ class LanguageServer(BaseLanguageServer):
         self.version = version
         self._text_document_sync_kind = text_document_sync_kind
         self._notebook_document_sync = notebook_document_sync
+        self._workspace_cls = workspace_cls
         self.process_id: int | None = None
         super().__init__(*args, **kwargs)
 

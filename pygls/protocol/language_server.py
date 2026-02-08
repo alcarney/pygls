@@ -32,7 +32,7 @@ from pygls.constants import PARAM_LS
 from pygls.exceptions import JsonRpcInvalidParams
 from pygls.protocol.json_rpc import JsonRPCProtocol
 from pygls.uris import from_fs_path
-from pygls.workspace import Workspace
+
 
 if typing.TYPE_CHECKING:
     from collections.abc import Generator
@@ -41,6 +41,7 @@ if typing.TYPE_CHECKING:
     from cattrs import Converter
 
     from pygls.lsp.server import LanguageServer
+    from pygls.workspace import Workspace
 
     F = TypeVar("F", bound=Callable)
 
@@ -158,7 +159,7 @@ class LanguageServerProtocol(JsonRPCProtocol):
 
         # Initialize the workspace before yielding to the user's initialize handler
         workspace_folders = params.workspace_folders or []
-        self._workspace = Workspace(
+        self._workspace = self._server._workspace_cls(
             root_uri,
             text_document_sync_kind,
             workspace_folders,
